@@ -1,13 +1,4 @@
 #include "astar.h"
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <limits>
-#include <cmath>
-#include <queue>
-#include <stack>
-#include <string>
-#include <iostream>
 
 AStar::AStar(const char *file){
     loadGrid(file);
@@ -69,98 +60,121 @@ vector<vector<int>> AStar::tracePath(const vector<vector<Cell>>& cellDetails, Pa
     return path;
 }
 
-vector<vector<int>> AStar::aStarSearch(Pair src, Pair dest) {
-
-    swap(src.first, src.second);
-    swap(dest.first, dest.second);
-    vector<vector<int>> path;
+vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> dest) {
+    vector<vector<vector<int>>> Paths;
+    vector<vector<int>> occupiedGrid(ROW, vector<int>(COL, -1)); // Track occupancy and the time step
     
-    if (!isValid(src.first, src.second) || !isValid(dest.first, dest.second)) {
-        cout << "Source or Destination is invalid\n";
-        return path;
-    }
+    // Lambda function to encode coordinates as a string for the occupied nodes set
+    auto encode = [](int x, int y) {
+        return to_string(x) + "," + to_string(y);
+    };
 
-    if (!isUnBlocked(src.first, src.second) || !isUnBlocked(dest.first, dest.second)) {
-        cout << "Source or Destination is blocked\n";
-        return path;
-    }
+    for (size_t x = 0; x < src.size(); ++x) {
+        swap(src[x].first, src[x].second);
+        swap(dest[x].first, dest[x].second);
+        vector<vector<int>> path;
 
-    if (isDestination(src.first, src.second, dest)) {
-        cout << "We are already at the destination\n";
-        path.push_back({src.first, src.second});
-        return path;
-    }
-
-    vector<vector<Cell>> cellDetails(ROW, vector<Cell>(COL));
-    vector<vector<bool>> closedList(ROW, vector<bool>(COL, false));
-
-    for (int i = 0; i < ROW; ++i) {
-        for (int j = 0; j < COL; ++j) {
-            cellDetails[i][j].f = numeric_limits<double>::max();
-            cellDetails[i][j].g = numeric_limits<double>::max();
-            cellDetails[i][j].h = numeric_limits<double>::max();
-            cellDetails[i][j].parent_i = -1;
-            cellDetails[i][j].parent_j = -1;
+        if (!isValid(src[x].first, src[x].second) || !isValid(dest[x].first, dest[x].second)) {
+            cout << "Source or Destination is invalid\n";
+            Paths.push_back(path);
+            continue;
         }
-    }
 
-    int i = src.first;
-    int j = src.second;
-    cellDetails[i][j].f = 0.0;
-    cellDetails[i][j].g = 0.0;
-    cellDetails[i][j].h = 0.0;
-    cellDetails[i][j].parent_i = i;
-    cellDetails[i][j].parent_j = j;
+        if (!isUnBlocked(src[x].first, src[x].second) || !isUnBlocked(dest[x].first, dest[x].second)) {
+            cout << "Source or Destination is blocked\n";
+            Paths.push_back(path);
+            continue;
+        }
 
-    priority_queue<pPair, vector<pPair>, greater<>> openList;
-    openList.push({0.0, {i, j}});
+        if (isDestination(src[x].first, src[x].second, dest[x])) {
+            cout << "We are already at the destination\n";
+            path.push_back({src[x].first, src[x].second});
+            Paths.push_back(path);
+            continue;
+        }
 
-    bool foundDest = false;
+        vector<vector<Cell>> cellDetails(ROW, vector<Cell>(COL));
+        vector<vector<bool>> closedList(ROW, vector<bool>(COL, false));
 
-    vector<int> rowNum = {1, -1, 0, 0};
-    vector<int> colNum = {0, 0, 1, -1};
+        for (int i = 0; i < ROW; ++i) {
+            for (int j = 0; j < COL; ++j) {
+                cellDetails[i][j].f = numeric_limits<double>::max();
+                cellDetails[i][j].g = numeric_limits<double>::max();
+                cellDetails[i][j].h = numeric_limits<double>::max();
+                cellDetails[i][j].parent_i = -1;
+                cellDetails[i][j].parent_j = -1;
+            }
+        }
 
-    while (!openList.empty()) {
-        pPair p = openList.top();
-        openList.pop();
+        int i = src[x].first;
+        int j = src[x].second;
+        cellDetails[i][j].f = 0.0;
+        cellDetails[i][j].g = 0.0;
+        cellDetails[i][j].h = 0.0;
+        cellDetails[i][j].parent_i = i;
+        cellDetails[i][j].parent_j = j;
 
-        i = p.second.first;
-        j = p.second.second;
-        closedList[i][j] = true;
+        priority_queue<pPair, vector<pPair>, greater<>> openList;
+        openList.push({0.0, {i, j}});
 
-        for (int k = 0; k < 4; ++k) {
-            int newRow = i + rowNum[k];
-            int newCol = j + colNum[k];
+        bool foundDest = false;
+        vector<int> rowNum = {1, -1, 0, 0};
+        vector<int> colNum = {0, 0, 1, -1};
+        int timeStep = 0; // Initialize the time step
 
-            if (isValid(newRow, newCol)) {
-                if (isDestination(newRow, newCol, dest)) {
-                    cellDetails[newRow][newCol].parent_i = i;
-                    cellDetails[newRow][newCol].parent_j = j;
-                    cout << "The destination cell is found\n";
-                    path = tracePath(cellDetails, dest);
-                    foundDest = true;
-                    return path;
-                } else if (!closedList[newRow][newCol] && isUnBlocked(newRow, newCol)) {
-                    double gNew = cellDetails[i][j].g + 1.0;
-                    double hNew = calculateHValue(newRow, newCol, dest);
-                    double fNew = gNew + hNew;
+        while (!openList.empty()) {
+            pPair p = openList.top();
+            openList.pop();
 
-                    if (cellDetails[newRow][newCol].f == numeric_limits<double>::max() || cellDetails[newRow][newCol].f > fNew) {
-                        openList.push({fNew, {newRow, newCol}});
-                        cellDetails[newRow][newCol].f = fNew;
-                        cellDetails[newRow][newCol].g = gNew;
-                        cellDetails[newRow][newCol].h = hNew;
+            i = p.second.first;
+            j = p.second.second;
+            closedList[i][j] = true;
+
+            for (int k = 0; k < 4; ++k) {
+                int newRow = i + rowNum[k];
+                int newCol = j + colNum[k];
+
+                if (isValid(newRow, newCol) && !closedList[newRow][newCol] && isUnBlocked(newRow, newCol)) {
+                    if (isDestination(newRow, newCol, dest[x])) {
                         cellDetails[newRow][newCol].parent_i = i;
                         cellDetails[newRow][newCol].parent_j = j;
+                        path = tracePath(cellDetails, dest[x]);
+                        foundDest = true;
+                        Paths.push_back(path);
+
+                        // Mark path nodes as occupied
+                        for (const auto& p : path) {
+                            occupiedGrid[p[0]][p[1]] = timeStep;
+                        }
+                        break;
+                    } else {
+                        double gNew = cellDetails[i][j].g + 1.0;
+                        double hNew = calculateHValue(newRow, newCol, dest[x]);
+                        double fNew = gNew + hNew;
+
+                        // Check if new position is occupied at the current time step
+                        if (occupiedGrid[newRow][newCol] == -1 || occupiedGrid[newRow][newCol] != timeStep) {
+                            if (cellDetails[newRow][newCol].f == numeric_limits<double>::max() || cellDetails[newRow][newCol].f > fNew) {
+                                openList.push({fNew, {newRow, newCol}});
+                                cellDetails[newRow][newCol].f = fNew;
+                                cellDetails[newRow][newCol].g = gNew;
+                                cellDetails[newRow][newCol].h = hNew;
+                                cellDetails[newRow][newCol].parent_i = i;
+                                cellDetails[newRow][newCol].parent_j = j;
+                            }
+                        }
                     }
                 }
             }
+
+            if (foundDest) break;
+            timeStep++; // Increment time step after each iteration
+        }
+
+        if (!foundDest) {
+            cout << "Failed to find the Destination Cell\n";
         }
     }
 
-    if (!foundDest) {
-        cout << "Failed to find the Destination Cell\n";
-    }
-
-    return path;
+    return Paths;
 }
