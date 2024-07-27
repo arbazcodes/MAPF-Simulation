@@ -62,8 +62,8 @@ vector<vector<int>> AStar::tracePath(const vector<vector<Cell>>& cellDetails, Pa
 
 vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> dest) {
     vector<vector<vector<int>>> Paths;
-    vector<vector<int>> occupiedGrid(ROW, vector<int>(COL, -1)); // Track occupancy and the time step
-    
+    unordered_set<string> occupiedNodes; // To avoid collisions
+
     // Lambda function to encode coordinates as a string for the occupied nodes set
     auto encode = [](int x, int y) {
         return to_string(x) + "," + to_string(y);
@@ -120,7 +120,6 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
         bool foundDest = false;
         vector<int> rowNum = {1, -1, 0, 0};
         vector<int> colNum = {0, 0, 1, -1};
-        int timeStep = 0; // Initialize the time step
 
         while (!openList.empty()) {
             pPair p = openList.top();
@@ -144,7 +143,7 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
 
                         // Mark path nodes as occupied
                         for (const auto& p : path) {
-                            occupiedGrid[p[0]][p[1]] = timeStep;
+                            occupiedNodes.insert(encode(p[0], p[1]));
                         }
                         break;
                     } else {
@@ -152,23 +151,19 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
                         double hNew = calculateHValue(newRow, newCol, dest[x]);
                         double fNew = gNew + hNew;
 
-                        // Check if new position is occupied at the current time step
-                        if (occupiedGrid[newRow][newCol] == -1 || occupiedGrid[newRow][newCol] != timeStep) {
-                            if (cellDetails[newRow][newCol].f == numeric_limits<double>::max() || cellDetails[newRow][newCol].f > fNew) {
-                                openList.push({fNew, {newRow, newCol}});
-                                cellDetails[newRow][newCol].f = fNew;
-                                cellDetails[newRow][newCol].g = gNew;
-                                cellDetails[newRow][newCol].h = hNew;
-                                cellDetails[newRow][newCol].parent_i = i;
-                                cellDetails[newRow][newCol].parent_j = j;
-                            }
+                        if (cellDetails[newRow][newCol].f == numeric_limits<double>::max() || cellDetails[newRow][newCol].f > fNew) {
+                            openList.push({fNew, {newRow, newCol}});
+                            cellDetails[newRow][newCol].f = fNew;
+                            cellDetails[newRow][newCol].g = gNew;
+                            cellDetails[newRow][newCol].h = hNew;
+                            cellDetails[newRow][newCol].parent_i = i;
+                            cellDetails[newRow][newCol].parent_j = j;
                         }
                     }
                 }
             }
 
             if (foundDest) break;
-            timeStep++; // Increment time step after each iteration
         }
 
         if (!foundDest) {
