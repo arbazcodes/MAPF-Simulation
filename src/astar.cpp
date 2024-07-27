@@ -43,7 +43,7 @@ bool AStar::isDestination(int row, int col, Pair dest) const {
 }
 
 double AStar::calculateHValue(int row, int col, Pair dest) const {
-    return sqrt((row - dest.first) + (col - dest.second));
+    return abs(row - dest.first) + abs(col - dest.second);
 }
 
 vector<vector<int>> AStar::tracePath(const vector<vector<Cell>>& cellDetails, Pair dest) const {
@@ -117,8 +117,8 @@ vector<vector<int>> AStar::aStarSearch(Pair src, Pair dest) {
 
     bool foundDest = false;
 
-    vector<int> rowNum = {-1, 1, 0, 0};
-    vector<int> colNum = {0, 0, -1, 1};
+    vector<int> rowNum = {1, -1, 0, 0};
+    vector<int> colNum = {0, 0, 1, -1};
 
     while (!openList.empty()) {
         pPair p = openList.top();
