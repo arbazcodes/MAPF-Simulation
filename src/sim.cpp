@@ -50,11 +50,20 @@ void Sim::Init()
     AStar astar("C:/Users/Lenovo/Desktop/Sim/levels/one.lvl");
 
     InitialPositions = {
+        glm::vec2((1.0f * UnitWidth) + UnitWidth/2 - RADIUS, (2.0f * UnitHeight) + UnitHeight/2 - RADIUS),
         glm::vec2((3.0f * UnitWidth) + UnitWidth/2 - RADIUS, (4.0f * UnitHeight) + UnitHeight/2 - RADIUS),
-        glm::vec2((4.0f * UnitWidth) + UnitWidth/2 - RADIUS, (2.0f * UnitHeight) + UnitHeight/2 - RADIUS)
+        glm::vec2((2.0f * UnitWidth) + UnitWidth/2 - RADIUS, (3.0f * UnitHeight) + UnitHeight/2 - RADIUS)
     };
 
-    std::vector<std::vector<std::vector<int>>> Paths = astar.aStarSearch({{3, 4}, {4, 2}}, {{3, 1}, {3, 2}});
+    vector<Pair> sources = {{1, 2}, {3, 4}, {2, 3}};
+    vector<Pair> destinations = {{4, 2}, {3, 1}, {4, 3}};
+
+    std::vector<std::vector<std::vector<int>>> Paths = astar.aStarSearch(sources, destinations);
+    
+    if (Paths.empty()) {
+            cout << "No path found.\n";
+    } 
+
 
     Robots.push_back(new Robot(InitialPositions[0], RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot")));
     Robots[0]->Path = Paths[0];
@@ -67,6 +76,13 @@ void Sim::Init()
     for (const auto& p : Robots[1]->Path) {
         std::cout << "(" << p[0] << "," << p[1] << ") ";
     }
+    std::cout << std::endl;
+    Robots.push_back(new Robot(InitialPositions[2], RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot")));
+    Robots[2]->Path = Paths[2];
+    for (const auto& p : Robots[2]->Path) {
+        std::cout << "(" << p[0] << "," << p[1] << ") ";
+    }
+    std::cout << std::endl;
 }
 
 void Sim::Update(float dt)

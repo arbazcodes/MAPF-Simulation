@@ -1,6 +1,6 @@
 #include "astar.h"
 
-AStar::AStar(const char *file){
+AStar::AStar(const char *file) {
     loadGrid(file);
     ROW = grid.size();
     COL = grid[0].size();
@@ -26,7 +26,7 @@ bool AStar::isValid(int row, int col) const {
 }
 
 bool AStar::isUnBlocked(int row, int col) const {
-    return grid[row][col] == 1;
+    return (grid[row][col] == 1);
 }
 
 bool AStar::isDestination(int row, int col, Pair dest) const {
@@ -55,24 +55,36 @@ vector<vector<int>> AStar::tracePath(const vector<vector<Cell>>& cellDetails, Pa
     while (!Path.empty()) {
         auto p = Path.top();
         Path.pop();
-        path.push_back({p.second, p.first});
+        path.push_back({p.first, p.second});
     }
     return path;
 }
 
 vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> dest) {
     vector<vector<vector<int>>> Paths;
-    unordered_set<string> occupiedNodes; // To avoid collisions
+    unordered_map<string, int> cellAvailability;
 
-    // Lambda function to encode coordinates as a string for the occupied nodes set
     auto encode = [](int x, int y) {
         return to_string(x) + "," + to_string(y);
     };
 
     for (size_t x = 0; x < src.size(); ++x) {
-        swap(src[x].first, src[x].second);
-        swap(dest[x].first, dest[x].second);
+        // swap(src[x].first, src[x].second);
+        // swap(dest[x].first, dest[x].second);
         vector<vector<int>> path;
+
+        vector<vector<Cell>> cellDetails(ROW, vector<Cell>(COL));
+        vector<vector<bool>> closedList(ROW, vector<bool>(COL, false));
+
+        for (int i = 0; i < ROW; ++i) {
+            for (int j = 0; j < COL; ++j) {
+                cellDetails[i][j].f = numeric_limits<double>::max();
+                cellDetails[i][j].g = numeric_limits<double>::max();
+                cellDetails[i][j].h = numeric_limits<double>::max();
+                cellDetails[i][j].parent_i = -1;
+                cellDetails[i][j].parent_j = -1;
+            }
+        }
 
         if (!isValid(src[x].first, src[x].second) || !isValid(dest[x].first, dest[x].second)) {
             cout << "Source or Destination is invalid\n";
@@ -93,19 +105,7 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
             continue;
         }
 
-        vector<vector<Cell>> cellDetails(ROW, vector<Cell>(COL));
-        vector<vector<bool>> closedList(ROW, vector<bool>(COL, false));
-
-        for (int i = 0; i < ROW; ++i) {
-            for (int j = 0; j < COL; ++j) {
-                cellDetails[i][j].f = numeric_limits<double>::max();
-                cellDetails[i][j].g = numeric_limits<double>::max();
-                cellDetails[i][j].h = numeric_limits<double>::max();
-                cellDetails[i][j].parent_i = -1;
-                cellDetails[i][j].parent_j = -1;
-            }
-        }
-
+        int timestep = 0;
         int i = src[x].first;
         int j = src[x].second;
         cellDetails[i][j].f = 0.0;
@@ -124,16 +124,28 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
         while (!openList.empty()) {
             pPair p = openList.top();
             openList.pop();
-
+            timestep++;
             i = p.second.first;
             j = p.second.second;
             closedList[i][j] = true;
+            string currentNode = encode(i, j);
+
+            cout << "Current cell: (" << i << ", " << j << ") at timestep " << timestep << endl;
 
             for (int k = 0; k < 4; ++k) {
                 int newRow = i + rowNum[k];
                 int newCol = j + colNum[k];
+                string newNode = encode(newRow, newCol);
 
-                if (isValid(newRow, newCol) && !closedList[newRow][newCol] && isUnBlocked(newRow, newCol)) {
+                if (isValid(newRow, newCol) && isUnBlocked(newRow, newCol)) {
+                    bool isOccupiedAtCurrentTime = (cellAvailability.find(newNode) != cellAvailability.end() && cellAvailability[newNode] > timestep);
+                    bool willBeFreeSoon = (cellAvailability.find(newNode) != cellAvailability.end() && cellAvailability[newNode] == timestep + 1);
+
+                    if (isOccupiedAtCurrentTime && !willBeFreeSoon) {
+                        cout << "Collision Detected at (" << newRow << ", " << newCol << ") at timestep " << timestep << endl;
+                        continue;
+                    }
+
                     if (isDestination(newRow, newCol, dest[x])) {
                         cellDetails[newRow][newCol].parent_i = i;
                         cellDetails[newRow][newCol].parent_j = j;
@@ -141,9 +153,9 @@ vector<vector<vector<int>>> AStar::aStarSearch(vector<Pair> src, vector<Pair> de
                         foundDest = true;
                         Paths.push_back(path);
 
-                        // Mark path nodes as occupied
                         for (const auto& p : path) {
-                            occupiedNodes.insert(encode(p[0], p[1]));
+                            string pathNode = encode(p[0], p[1]);
+                            cellAvailability[pathNode] = timestep + 1; 
                         }
                         break;
                     } else {

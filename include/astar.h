@@ -1,16 +1,13 @@
-#ifndef ASTAR_H
-#define ASTAR_H
-
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <limits>
 #include <cmath>
+#include <unordered_map>
+#include <string>
 #include <stack>
 #include <fstream>
 #include <sstream>
-#include <string>
-#include <unordered_set>
 
 using namespace std;
 
@@ -24,18 +21,16 @@ struct Cell {
 
 class AStar {
 public:
-    AStar(const char* file);
+    AStar(const char *file);
     vector<vector<vector<int>>> aStarSearch(vector<Pair> src, vector<Pair> dest);
 
 private:
     vector<vector<int>> grid;
     int ROW, COL;
-    void loadGrid(const char* file);
+    void loadGrid(const char *file);
     bool isValid(int row, int col) const;
     bool isUnBlocked(int row, int col) const;
     bool isDestination(int row, int col, Pair dest) const;
     double calculateHValue(int row, int col, Pair dest) const;
     vector<vector<int>> tracePath(const vector<vector<Cell>>& cellDetails, Pair dest) const;
 };
-
-#endif
