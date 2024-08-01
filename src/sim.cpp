@@ -4,6 +4,7 @@
 #include "sim_object.h"
 #include "robot.h"
 #include "astar.h"
+#include "cbs.h"
 
 // Game-related State data
 SpriteRenderer  *Renderer;
@@ -38,65 +39,93 @@ void Sim::Init()
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
     // load textures
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim/textures/background.jpg", false, "background");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim/textures/robot.png", true, "robot");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim/textures/block.png", false, "block");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/background.jpg", false, "background");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/robot.png", true, "robot");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/block.png", false, "block");
 
     // load grid
-    grid.Load("C:/Users/Lenovo/Desktop/Sim/levels/one.lvl", this->Width, this->Height);
+    grid.Load("C:/Users/Lenovo/Desktop/Sim1/levels/one.lvl", this->Width, this->Height);
     this->UnitWidth = grid.unitWidth;
     this->UnitHeight = grid.unitHeight;
 
-    AStar astar("C:/Users/Lenovo/Desktop/Sim/levels/one.lvl");
-
     InitialPositions = {
-        glm::vec2((1.0f * UnitWidth) + UnitWidth/2 - RADIUS, (2.0f * UnitHeight) + UnitHeight/2 - RADIUS),
-        glm::vec2((3.0f * UnitWidth) + UnitWidth/2 - RADIUS, (4.0f * UnitHeight) + UnitHeight/2 - RADIUS),
-        glm::vec2((2.0f * UnitWidth) + UnitWidth/2 - RADIUS, (3.0f * UnitHeight) + UnitHeight/2 - RADIUS)
+        glm::vec2((0.0f * UnitWidth) + UnitWidth/2 - RADIUS, (0.0f * UnitHeight) + UnitHeight/2 - RADIUS),
+        glm::vec2((0.0f * UnitWidth) + UnitWidth/2 - RADIUS, (2.0f * UnitHeight) + UnitHeight/2 - RADIUS),
+        glm::vec2((0.0f * UnitWidth) + UnitWidth/2 - RADIUS, (1.0f * UnitHeight) + UnitHeight/2 - RADIUS)
     };
 
-    vector<Pair> sources = {{1, 2}, {3, 4}, {2, 3}};
-    vector<Pair> destinations = {{4, 2}, {3, 1}, {4, 3}};
+    std::vector<Pair> starts = {
+        {0, 0}, 
+        {0, 2}, 
+        {0, 1}, 
+        {1, 1}, 
+        {1, 0}, 
+        {2, 1}, 
+        {2, 2}, 
+        //{2, 0}
+    };
+    std::vector<Pair> goals = {
+        {0, 2}, 
+        {0, 0}, 
+        {1, 1}, 
+        {1, 0}, 
+        {2, 1}, 
+        {1, 2}, 
+        {2, 0}, 
+    //{2, 2}
+    };
 
-    std::vector<std::vector<std::vector<int>>> Paths = astar.aStarSearch(sources, destinations);
-    
-    if (Paths.empty()) {
-            cout << "No path found.\n";
-    } 
+    std::vector<std::vector<int>> Grid = {
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+    };
+
+    Cbs cbsAlgorithm(Grid);
+
+    std::vector<CostPath> solution = cbsAlgorithm.HighLevel(starts, goals);
 
 
     Robots.push_back(new Robot(InitialPositions[0], RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot")));
-    Robots[0]->Path = Paths[0];
-    for (const auto& p : Robots[0]->Path) {
-        std::cout << "(" << p[0] << "," << p[1] << ") ";
+    Robots[0]->Path = solution[0];
+    for (const auto& step : Robots[0]->Path) {
+        std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] <<", "<< step[3] <<  ") ";
     }
     std::cout << std::endl;
     Robots.push_back(new Robot(InitialPositions[1], RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot")));
-    Robots[1]->Path = Paths[1];
-    for (const auto& p : Robots[1]->Path) {
-        std::cout << "(" << p[0] << "," << p[1] << ") ";
+    Robots[1]->Path = solution[1];
+    for (const auto& step : Robots[1]->Path) {
+        std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] <<", "<< step[3] <<  ") ";
     }
     std::cout << std::endl;
     Robots.push_back(new Robot(InitialPositions[2], RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot")));
-    Robots[2]->Path = Paths[2];
-    for (const auto& p : Robots[2]->Path) {
-        std::cout << "(" << p[0] << "," << p[1] << ") ";
+    Robots[2]->Path = solution[2];
+    for (const auto& step : Robots[2]->Path) {
+        std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] <<", "<< step[3] <<  ") ";
     }
     std::cout << std::endl;
 }
 
 void Sim::Update(float dt)
 {
-    for (auto robot : Robots) {
-        if (robot->currentPathIndex < robot->Path.size()) {
-            robot->Rotate(dt);
-
-            if(!robot->isRotating)
+    for (auto robot : Robots)
+    {
+        if (robot->currentPathIndex < robot->Path.size())
+        {
+            //if (robot->isRotating)
+            // {
+            //     robot->Rotate(dt);
+            // }
+            // else
+            // {   
                 robot->Move(dt, this->UnitWidth, this->UnitHeight);
+            //}
         }
     }
 }
-
 
 void Sim::Render()
 {

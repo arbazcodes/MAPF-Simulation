@@ -10,28 +10,52 @@ Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite)
     : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(100.0f)
 {}
 
-void Robot::Rotate(float dt){
+void Robot::Rotate(float dt)
+{
+    if (this->currentPathIndex < 1)
+        return; // No rotation needed if no previous path
 
-    int x = this->Path[this->currentPathIndex][0] - this->Path[this->currentPathIndex - 1][0];
-    int y = this->Path[this->currentPathIndex][1] - this->Path[this->currentPathIndex - 1][1];
-
+    int targetDirection = Path[this->currentPathIndex][2];
     float targetAngle;
-            
-    if(x == 1)
-        targetAngle =  90;  
-    if(x == -1)
-        targetAngle =  -90;
-    if(y == 1)
-        targetAngle = 180; 
-    if(y == -1)
-        targetAngle = 0; 
 
-    if(std::abs(this->CurrentRotation - targetAngle) < 1.0f)
+    if (targetDirection == 2)
+        targetAngle = 0.0f; // Facing right
+    else if (targetDirection == 1)
+        targetAngle = -90.0f; // Facing left
+    else if (targetDirection == 0)
+        targetAngle = 90.0f; // Facing up
+    else if (targetDirection == 3)
+        targetAngle = 180.0f; // Facing down
+
+    float angleDiff = targetAngle - this->CurrentRotation;
+
+    // Normalize angle difference to the range (-180, 180)
+    while (angleDiff > 180.0f)
+        angleDiff -= 360.0f;
+    while (angleDiff < -180.0f)
+        angleDiff += 360.0f;
+
+    if (std::abs(angleDiff) < 1.0f)
+    {
+        this->CurrentRotation = targetAngle;
         this->isRotating = false;
-
-    float direction = glm::normalize(targetAngle - this->CurrentRotation);
-    float rotation = direction * this->AngularVelocity * dt;
-    this->CurrentRotation += rotation;
+    }
+    else
+    {
+        float rotationSpeed = this->AngularVelocity * dt;
+        if (std::abs(angleDiff) < rotationSpeed)
+        {
+            this->CurrentRotation = targetAngle;
+            this->isRotating = false;
+        }
+        else
+        {
+            if (angleDiff > 0)
+                this->CurrentRotation += rotationSpeed;
+            else
+                this->CurrentRotation -= rotationSpeed;
+        }
+    }
 }
 
 void Robot::Move(float dt, float unit_width, float unit_height){

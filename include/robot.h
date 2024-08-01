@@ -9,6 +9,8 @@
 #include "sprite_renderer.h"
 #include <vector>
 
+//enum Dir { UP, DOWN, LEFT, RIGHT};
+
 class Robot
 {
 public:
@@ -19,7 +21,7 @@ public:
     float InitialRotation, CurrentRotation, AngularVelocity;
     glm::vec2   InitialPosition, CurrentPosition, Velocity;
     std::vector<std::vector<int>> Path;
-    unsigned int currentPathIndex = 1;
+    int currentPathIndex = 1;
 
     Robot();
     Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite);

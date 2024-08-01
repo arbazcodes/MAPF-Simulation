@@ -1,36 +1,43 @@
-#include <iostream>
+#ifndef ASTAR_H
+#define ASTAR_H
+
 #include <vector>
-#include <queue>
-#include <limits>
-#include <cmath>
-#include <unordered_map>
-#include <string>
-#include <stack>
-#include <fstream>
-#include <sstream>
+#include <utility>
 
-using namespace std;
+typedef std::pair<int, int> Pair;
 
-typedef pair<int, int> Pair;
-typedef pair<double, Pair> pPair;
-
-struct Cell {
-    double f, g, h;
-    int parent_i, parent_j;
+enum Direction
+{
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
 };
 
-class AStar {
-public:
-    AStar(const char *file);
-    vector<vector<vector<int>>> aStarSearch(vector<Pair> src, vector<Pair> dest);
-
-private:
-    vector<vector<int>> grid;
-    int ROW, COL;
-    void loadGrid(const char *file);
-    bool isValid(int row, int col) const;
-    bool isUnBlocked(int row, int col) const;
-    bool isDestination(int row, int col, Pair dest) const;
-    double calculateHValue(int row, int col, Pair dest) const;
-    vector<vector<int>> tracePath(const vector<vector<Cell>>& cellDetails, Pair dest) const;
+struct Constraint
+{
+    int id;
+    int x;
+    int y;
+    int time;
 };
+
+struct State
+{
+    Pair position;
+    Direction direction;
+    int time_step;
+
+    bool operator<(const State &other) const
+    {
+        return std::tie(position, direction, time_step) < std::tie(other.position, other.direction, other.time_step);
+    }
+};
+
+std::vector<std::vector<int>> AStarAlgorithm(
+    const Pair &start,
+    const Pair &goal,
+    const std::vector<Constraint> &constraints,
+    const std::vector<std::vector<int>> &grid);
+
+#endif // ASTAR_H
