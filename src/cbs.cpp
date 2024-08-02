@@ -34,14 +34,14 @@ std::optional<std::vector<CostPath>> Cbs::LowLevel(
     }
 
     // Find the maximum path length
-    int max_length = 0;
-    for (const auto &path : solution)
-    {
-        if (path.size() > max_length)
-        {
-            max_length = path.size();
-        }
-    }
+    // int max_length = 0;
+    // for (const auto &path : solution)
+    // {
+    //     if (path.size() > max_length)
+    //     {
+    //         max_length = path.size();
+    //     }
+    // }
 
     // // Extend all paths to match the maximum length
     // for (auto &path : solution)

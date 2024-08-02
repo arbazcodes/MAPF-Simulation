@@ -1,5 +1,6 @@
 #ifndef GAMELEVEL_H
 #define GAMELEVEL_H
+
 #include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -16,9 +17,12 @@ public:
     Grid() {}
 
     void Load(const char *file, unsigned int levelWidth, unsigned int levelHeight);
+    void SetDestinationColor(const glm::vec2 &destination, const glm::vec3 &color);
     void Draw(SpriteRenderer &renderer);
+
 private:
     void init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight);
+    std::vector<std::vector<unsigned int>> tileData;
 };
 
 #endif
