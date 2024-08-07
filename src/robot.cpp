@@ -8,7 +8,7 @@ Robot::Robot()
 
 // Constructor with specified values
 Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
-    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(100.0f), Color(color)
+    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(150.0f), Color(color)
 {
 }
 
@@ -22,17 +22,17 @@ void Robot::Rotate(float dt)
 
     switch (targetDirection)
     {
-    case 2:
+    case 0:
         targetAngle = 0.0f;
         break; // Facing right
     case 1:
-        targetAngle = -90.0f;
+        targetAngle = 180.0f;
         break; // Facing left
-    case 0:
-        targetAngle = 90.0f;
+    case 2:
+        targetAngle = -90.0f;
         break; // Facing up
     case 3:
-        targetAngle = 180.0f;
+        targetAngle = 90.0f;
         break; // Facing down
     default:
         return; // Invalid direction
@@ -40,7 +40,6 @@ void Robot::Rotate(float dt)
 
     float angleDiff = targetAngle - this->CurrentRotation;
 
-    // Normalize angle difference to the range (-180, 180)
     while (angleDiff > 180.0f)
         angleDiff -= 360.0f;
     while (angleDiff < -180.0f)
@@ -74,10 +73,10 @@ void Robot::Rotate(float dt)
 void Robot::Move(float dt, float unit_width, float unit_height)
 {
     if (!this->isMoving)
-        return; // Move only if we are in the correct direction
+        return;
 
     if (this->currentPathIndex >= Path.size())
-        return; // No movement needed if no path remaining
+        return;
 
     int x = this->Path[currentPathIndex][0] - this->Path[currentPathIndex - 1][0];
     int y = this->Path[currentPathIndex][1] - this->Path[currentPathIndex - 1][1];
@@ -159,7 +158,6 @@ bool Robot::IsFacingTargetDirection(int targetDirection)
 
     float angleDiff = targetAngle - this->CurrentRotation;
 
-    // Normalize angle difference to the range (-180, 180)
     while (angleDiff > 180.0f)
         angleDiff -= 360.0f;
     while (angleDiff < -180.0f)

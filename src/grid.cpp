@@ -35,6 +35,8 @@ void Grid::init(std::vector<std::vector<unsigned int>> tileData, unsigned int le
     // calculate dimensions
     unsigned int height = tileData.size();
     unsigned int width = tileData[0].size();
+    this->ROW = height;
+    this->COL = width;
     float unit_width = levelWidth / static_cast<float>(width);
     float unit_height = levelHeight / height;
     this->unitWidth = unit_width;

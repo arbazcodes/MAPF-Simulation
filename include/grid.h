@@ -12,7 +12,7 @@ class Grid
 {
 public:
     std::vector<SimObject> Bricks;
-    unsigned int unitWidth, unitHeight;
+    unsigned int unitWidth, unitHeight, ROW, COL;
 
     Grid() {}
 

@@ -15,8 +15,8 @@ class Sim
 public:
     unsigned int Width, Height;
     float UnitWidth, UnitHeight;
-    Grid  grid;
-    
+    Grid grid;
+
     Sim(unsigned int width, unsigned int height);
     ~Sim();
     void Init();
@@ -24,7 +24,7 @@ public:
     void Render();
 
 private:
-    std::vector<Robot*> Robots;
+    std::vector<Robot *> Robots;
 };
 
 #endif

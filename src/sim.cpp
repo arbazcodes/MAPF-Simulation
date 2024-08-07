@@ -7,18 +7,19 @@
 #include "cbs.h"
 
 // Game-related State data
-SpriteRenderer  *Renderer;
+SpriteRenderer *Renderer;
 std::vector<glm::vec2> InitialPositions;
 
-Sim::Sim(unsigned int width, unsigned int height) 
+Sim::Sim(unsigned int width, unsigned int height)
     : Width(width), Height(height)
-{ 
+{
 }
 
 Sim::~Sim()
 {
     delete Renderer;
-    for (auto robot : Robots) {
+    for (auto robot : Robots)
+    {
         delete robot;
     }
     Robots.clear();
@@ -54,7 +55,7 @@ void Sim::Init()
 
     std::vector<Pair> starts = {
         {0, 0},
-        {0, 2},
+        //{0, 2},
         {0, 1},
         {1, 1},
         {1, 0},
@@ -64,7 +65,7 @@ void Sim::Init()
     };
     std::vector<Pair> goals = {
         {0, 2},
-        {0, 0},
+        //{0, 0},
         {1, 1},
         {1, 0},
         {2, 1},
@@ -126,7 +127,8 @@ void Sim::Render()
     Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
     this->grid.Draw(*Renderer);
 
-    for (auto robot : Robots) {
+    for (auto robot : Robots)
+    {
         robot->Draw(*Renderer);
     }
 }
