@@ -54,18 +54,27 @@ void Sim::Init()
         glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (2.0f * UnitHeight) + UnitHeight / 2 - RADIUS),
         glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (1.0f * UnitHeight) + UnitHeight / 2 - RADIUS)};
 
-    auto endpoints = GenerateEndpoints(4, 3, 3);
+    auto endpoints = GenerateEndpoints(NUMBER_OF_ROBOTS, ROWS, COLS);
 
-    std::vector<Pair> starts = endpoints[0];
-    std::vector<Pair> goals = endpoints[1];
+    // std::vector<Pair> starts = endpoints[0];
+    // std::vector<Pair> goals = endpoints[1];
 
-    std::vector<std::vector<int>> Grid = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+    std::vector<Pair> starts = 
+        {
+            {0, 0},
+            {0, 1},
+            {0, 2},
+            {1, 0},
+        };
+    std::vector<Pair> goals =
+        {
+            {0, 2},
+            {1, 2},
+            {2, 0},
+            {2, 1},
+        };
+
+    std::vector<std::vector<int>> Grid(ROWS, std::vector<int>(COLS, 1));
 
     Cbs cbsAlgorithm(Grid);
 
@@ -101,10 +110,33 @@ void Sim::Update(float dt)
             }
             else
             {
-                robot->Move(dt, this->UnitWidth, this->UnitHeight);
+                bool allReached = AllReachedDestination();
+                bool allRotated = AllRotated();
+                robot->Move(dt, this->UnitWidth, this->UnitHeight, allReached, allRotated);
             }
         }
     }
+}
+
+bool Sim::AllReachedDestination()
+{
+    for (auto robot : Robots)
+    {
+        if (!robot->reachedDestination && robot->currentPathIndex < robot->Path.size())
+            return false;
+    }
+
+    return true;
+}
+bool Sim::AllRotated()
+{
+    for (auto robot : Robots)
+    {
+        if (!robot->rotated)
+            return false;
+    }
+
+    return true;
 }
 
 void Sim::Render()

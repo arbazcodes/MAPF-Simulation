@@ -6,8 +6,10 @@
 #include "grid.h"
 #include "robot.h"
 
-const glm::vec2 INITIAL_VELOCITY(100.0f, 100.0f);
-const float RADIUS = 25.0f;
+const glm::vec2 INITIAL_VELOCITY(500.0f, 500.0f);
+const float RADIUS = 50.0f;
+#define ROWS 3
+#define COLS 3
 #define NUMBER_OF_ROBOTS 4
 
 class Sim
@@ -22,6 +24,9 @@ public:
     void Init();
     void Update(float dt);
     void Render();
+
+    bool AllReachedDestination();
+    bool AllRotated();
 
 private:
     std::vector<Robot *> Robots;
