@@ -42,11 +42,12 @@ std::vector<State> GetNeighbors(
     const std::vector<std::vector<int>> &grid,
     std::map<int, std::set<Pair>> vertex_constraint_map,
     std::map<int, std::set<Pair>> edge_constraint_map,
-    std::vector<std::vector<int>> stopping_constraint_map)
+    std::vector<std::vector<int>> stopping_constraint_map,
+    std::map<int, std::set<Pair>> following_constraint_map)
 {
     std::vector<State> neighbors;
-    std::vector<Pair> direction_vectors = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-    std::vector<Direction> directions = {DOWN, RIGHT, UP, LEFT};
+    std::vector<Pair> direction_vectors = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {0, 0}};
+    std::vector<Direction> directions = {DOWN, RIGHT, UP, LEFT, STAY};
 
     for (int i = 0; i < directions.size(); ++i)
     {
@@ -67,6 +68,11 @@ std::vector<State> GetNeighbors(
         }
         if (edge_constraint_map.find(next_time_step) != edge_constraint_map.end() &&
             edge_constraint_map[next_time_step].find(next_cell) != edge_constraint_map[next_time_step].end())
+        {
+            continue;
+        }
+        if (following_constraint_map.find(next_time_step) != following_constraint_map.end() &&
+            following_constraint_map[next_time_step].find(next_cell) != following_constraint_map[next_time_step].end())
         {
             continue;
         }
@@ -123,6 +129,7 @@ std::vector<std::vector<int>> AStarAlgorithm(
     std::map<int, std::set<Pair>> vertex_constraint_map;
     std::map<int, std::set<Pair>> edge_constraint_map;
     std::vector<std::vector<int>> stopping_constraint_map;
+    std::map<int, std::set<Pair>> following_constraint_map;
 
     for (const auto &constraint : constraints)
     {
@@ -138,6 +145,26 @@ std::vector<std::vector<int>> AStarAlgorithm(
         {
             stopping_constraint_map.push_back({constraint.x, constraint.y, constraint.time});
         }
+        else if (constraint.type == 3)
+        {
+            following_constraint_map[constraint.time].insert({constraint.x, constraint.y});
+            // std::cout << "Following Constraints:" << std::endl;
+
+            // // Iterate over the map
+            // for (const auto &entry : following_constraint_map)
+            // {
+            //     int time_step = entry.first;
+            //     const std::set<Pair> &constraints = entry.second;
+
+            //     std::cout << "Time Step " << time_step << ":" << std::endl;
+
+            //     // Iterate over the set of pairs for this time step
+            //     for (const auto &pair : constraints)
+            //     {
+            //         std::cout << "  (" << pair.first << ", " << pair.second << ")" << std::endl;
+            //     }
+            // }
+        }
     }
 
     while (!open_list.empty())
@@ -151,7 +178,7 @@ std::vector<std::vector<int>> AStarAlgorithm(
             auto constraint_time = GetConstraintTime(current.position, stopping_constraint_map);
             if (constraint_time.has_value() && current.time_step < constraint_time.value())
             {
-                std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map);
+                std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map, following_constraint_map);
 
                 for (const auto &neighbor : neighbors)
                 {
@@ -182,7 +209,7 @@ std::vector<std::vector<int>> AStarAlgorithm(
             return path;
         }
 
-        std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map);
+        std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map, following_constraint_map);
 
         for (const auto &neighbor : neighbors)
         {

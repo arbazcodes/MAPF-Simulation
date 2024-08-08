@@ -8,7 +8,7 @@ Robot::Robot()
 
 // Constructor with specified values
 Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
-    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(150.0f), Color(color)
+    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(300.0f), Color(color)
 {
 }
 
@@ -33,7 +33,10 @@ void Robot::Rotate(float dt)
         break; // Facing up
     case 3:
         targetAngle = 90.0f;
-        break; // Facing down
+        break; // Facing dow
+    case 4:
+        targetAngle = CurrentRotation;
+        break; 
     default:
         return; // Invalid direction
     }

@@ -5,6 +5,7 @@
 #include "robot.h"
 #include "astar.h"
 #include "cbs.h"
+#include "tapf.h"
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -53,26 +54,10 @@ void Sim::Init()
         glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (2.0f * UnitHeight) + UnitHeight / 2 - RADIUS),
         glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (1.0f * UnitHeight) + UnitHeight / 2 - RADIUS)};
 
-    std::vector<Pair> starts = {
-        {0, 0},
-        //{0, 2},
-        {0, 1},
-        {1, 1},
-        {1, 0},
-        {2, 1},
-        {2, 2},
-        //{2, 0}
-    };
-    std::vector<Pair> goals = {
-        {0, 2},
-        //{0, 0},
-        {1, 1},
-        {1, 0},
-        {2, 1},
-        {1, 2},
-        {2, 0},
-        //{2, 2}
-    };
+    auto endpoints = GenerateEndpoints(4, 3, 3);
+
+    std::vector<Pair> starts = endpoints[0];
+    std::vector<Pair> goals = endpoints[1];
 
     std::vector<std::vector<int>> Grid = {
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},

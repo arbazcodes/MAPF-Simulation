@@ -43,6 +43,7 @@ private:
     std::vector<std::vector<int>> FindConflictsEdge(const std::vector<CostPath> &solution) const;
     std::vector<std::vector<int>> FindConflictsVertex(const std::vector<CostPath> &solution) const;
     std::vector<std::vector<int>> FindStoppingConflicts(const std::vector<CostPath> &solution) const;
+    std::vector<std::vector<int>> FindConflictsFollow(const std::vector<CostPath> &solution) const;
 };
 
 #endif
