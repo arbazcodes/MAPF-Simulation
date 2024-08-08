@@ -28,7 +28,7 @@ Sim::~Sim()
 
 void Sim::Init()
 {
-    ResourceManager::LoadShader("C:/Users/Lenovo/Desktop/Sim/shaders/sprite.vs", "C:/Users/Lenovo/Desktop/sim/shaders/sprite.fs", nullptr, "sprite");
+    ResourceManager::LoadShader("C:/Users/Lenovo/Desktop/Simulation/shaders/sprite.vs", "C:/Users/Lenovo/Desktop/Simulation/shaders/sprite.fs", nullptr, "sprite");
 
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width),
@@ -40,12 +40,12 @@ void Sim::Init()
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
     // load textures
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/background.jpg", false, "background");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/robot.png", true, "robot");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Sim1/textures/block.png", false, "block");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/background.jpg", false, "background");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/robot.png", true, "robot");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/block.png", false, "block");
 
     // load grid
-    grid.Load("C:/Users/Lenovo/Desktop/Sim1/levels/one.lvl", this->Width, this->Height);
+    grid.Load("C:/Users/Lenovo/Desktop/Simulation/levels/one.lvl", this->Width, this->Height);
     this->UnitWidth = grid.unitWidth;
     this->UnitHeight = grid.unitHeight;
 
@@ -56,23 +56,23 @@ void Sim::Init()
 
     auto endpoints = GenerateEndpoints(NUMBER_OF_ROBOTS, ROWS, COLS);
 
-    std::vector<Pair> starts = endpoints[0];
-    std::vector<Pair> goals = endpoints[1];
+    // std::vector<Pair> starts = endpoints[0];
+    // std::vector<Pair> goals = endpoints[1];
 
-    // std::vector<Pair> starts = 
-    //     {
-    //         {0, 2},
-    //         {1, 1},
-    //         {1, 2},
-    //         {2, 0},
-    //     };
-    // std::vector<Pair> goals =
-    //     {
-    //         {0, 0},
-    //         {0, 2},
-    //         {1, 0},
-    //         {1, 1},
-    //     };
+    std::vector<Pair> starts =
+        {
+            {0, 0},
+            {1, 2},
+            {2, 0},
+            {2, 2},
+        };
+    std::vector<Pair> goals =
+        {
+            {0, 2},
+            {1, 1},
+            {1, 2},
+            {2, 2},
+        };
 
     std::vector<std::vector<int>> Grid(ROWS, std::vector<int>(COLS, 1));
 
@@ -82,7 +82,7 @@ void Sim::Init()
 
     for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
     {
-        glm::vec2 InitialPosition = glm::vec2(((float)starts[i].first * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)starts[i].second * UnitHeight) + UnitHeight / 2 - RADIUS);
+        glm::vec2 InitialPosition = glm::vec2(((float)solution[i][0][0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i][0][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
         glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
         Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
         Robots[i]->Path = solution[i];

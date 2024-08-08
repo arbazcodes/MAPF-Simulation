@@ -17,7 +17,7 @@ int RotationCost(Direction from, Direction to)
 {
     // Define opposite directions
     if ((from == UP && to == DOWN) || (from == DOWN && to == UP) ||
-        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT) || to == STAY)
+        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT) || from == to)
     {
         return 0; // No rotation cost for opposite directions
     }
@@ -93,7 +93,7 @@ std::vector<State> GetNeighbors(
         // If moving in the opposite direction, keep the same direction
         Direction current_direction = current.direction;
         if ((current_direction == UP && new_direction == DOWN) || (current_direction == DOWN && new_direction == UP) ||
-            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT) || new_direction == STAY)
+            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT || new_direction == STAY))
         {
             new_direction = current_direction; // Keep the same direction
         }
@@ -148,22 +148,6 @@ std::vector<std::vector<int>> AStarAlgorithm(
         else if (constraint.type == 3)
         {
             following_constraint_map[constraint.time].insert({constraint.x, constraint.y});
-            // std::cout << "Following Constraints:" << std::endl;
-
-            // // Iterate over the map
-            // for (const auto &entry : following_constraint_map)
-            // {
-            //     int time_step = entry.first;
-            //     const std::set<Pair> &constraints = entry.second;
-
-            //     std::cout << "Time Step " << time_step << ":" << std::endl;
-
-            //     // Iterate over the set of pairs for this time step
-            //     for (const auto &pair : constraints)
-            //     {
-            //         std::cout << "  (" << pair.first << ", " << pair.second << ")" << std::endl;
-            //     }
-            // }
         }
     }
 

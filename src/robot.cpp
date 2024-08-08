@@ -35,9 +35,6 @@ void Robot::Rotate(float dt)
     case 3:
         targetAngle = 90.0f;
         break; // Facing dow
-    case 4:
-        targetAngle = CurrentRotation;
-        break; 
     default:
         return; // Invalid direction
     }
