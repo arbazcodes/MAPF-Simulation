@@ -17,7 +17,7 @@ int RotationCost(Direction from, Direction to)
 {
     // Define opposite directions
     if ((from == UP && to == DOWN) || (from == DOWN && to == UP) ||
-        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT))
+        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT) || to == STAY)
     {
         return 0; // No rotation cost for opposite directions
     }
@@ -93,7 +93,7 @@ std::vector<State> GetNeighbors(
         // If moving in the opposite direction, keep the same direction
         Direction current_direction = current.direction;
         if ((current_direction == UP && new_direction == DOWN) || (current_direction == DOWN && new_direction == UP) ||
-            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT))
+            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT) || new_direction == STAY)
         {
             new_direction = current_direction; // Keep the same direction
         }
