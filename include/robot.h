@@ -18,6 +18,7 @@ public:
     bool isMoving = false;
     float InitialRotation, CurrentRotation, AngularVelocity;
     bool reachedDestination, rotated;
+    int targetDirection, targetAngle;
 
     glm::vec2 InitialPosition, CurrentPosition, Velocity;
     glm::vec3 Color; // New attribute for color
@@ -26,14 +27,11 @@ public:
 
     Robot();
     Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color);
-
-    glm::vec2 checkBounds(int x, int y, glm::vec2 movement, glm::vec2 targetPosition);
     void Rotate(float dt);
     void Move(float dt, float unit_width, float unit_height, bool AllRobotsReached = false, bool AllRobotsRotated = false);
     void Reset(glm::vec2 position, glm::vec2 velocity);
     void Draw(SpriteRenderer &renderer);
     glm::vec2 GetPosition();
-    bool IsFacingTargetDirection(int targetDirection);
 
 private:
     glm::vec3 defaultColor = glm::vec3(1.0f, 1.0f, 1.0f); // Default color if not specified

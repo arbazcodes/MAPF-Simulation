@@ -19,8 +19,7 @@ void Robot::Rotate(float dt)
     if (this->currentPathIndex >= Path.size())
         return; // No rotation needed if no path remaining
 
-    int targetDirection = Path[this->currentPathIndex][2];
-    float targetAngle;
+    targetDirection = Path[this->currentPathIndex][2];
 
     switch (targetDirection)
     {
@@ -56,6 +55,7 @@ void Robot::Rotate(float dt)
         this->CurrentRotation = targetAngle;
         this->isRotating = false;
         this->isMoving = true;
+        return;
     }
     else
     {
@@ -65,6 +65,7 @@ void Robot::Rotate(float dt)
             this->CurrentRotation = targetAngle;
             this->isRotating = false;
             this->isMoving = true;
+            rotated = true;
         }
         else
         {
@@ -97,9 +98,9 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
         this->isMoving = false;
         this->InitialPosition = CurrentPosition;
         this->currentPathIndex++;
-        glm::vec2 targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
+        targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
         return;
-    } else if ( reachedDestination )
+    } else if (reachedDestination)
     {
         return;
     }
@@ -145,37 +146,6 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     }
 
     this->CurrentPosition += movement;
-}
-
-bool Robot::IsFacingTargetDirection(int targetDirection)
-{
-    float targetAngle;
-    switch (targetDirection)
-    {
-    case 2:
-        targetAngle = 0.0f;
-        break; // Facing right
-    case 1:
-        targetAngle = -90.0f;
-        break; // Facing left
-    case 0:
-        targetAngle = 90.0f;
-        break; // Facing up
-    case 3:
-        targetAngle = 180.0f;
-        break; // Facing down
-    default:
-        return false; // Invalid direction
-    }
-
-    float angleDiff = targetAngle - this->CurrentRotation;
-
-    while (angleDiff > 180.0f)
-        angleDiff -= 360.0f;
-    while (angleDiff < -180.0f)
-        angleDiff += 360.0f;
-
-    return std::abs(angleDiff) < 1.0f;
 }
 
 void Robot::Reset(glm::vec2 position, glm::vec2 velocity)
