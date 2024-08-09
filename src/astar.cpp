@@ -9,19 +9,20 @@
 // Function to calculate Manhattan distance
 int ManhattanDistance(const Pair &a, const Pair &b)
 {
-    return std::abs(a.first - b.first) + std::abs(a.second - b.second);
+    return std::sqrt(std::pow(std::abs(a.first - b.first), 2) + std::pow(std::abs(a.second - b.second), 2));
 }
 
 // Function to calculate the cost of rotation between two directions
 int RotationCost(Direction from, Direction to)
 {
-    // Define opposite directions
+    if (from == to)
+        return 0;
     if ((from == UP && to == DOWN) || (from == DOWN && to == UP) ||
-        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT) || from == to)
+        (from == LEFT && to == RIGHT) || (from == RIGHT && to == LEFT))
     {
-        return 0; // No rotation cost for opposite directions
+        return 1; // No rotation cost for opposite directions
     }
-    return 1; // Default rotation cost
+    return 2; // Default rotation cost
 }
 
 // Function to get constraint time for a given position
@@ -93,7 +94,7 @@ std::vector<State> GetNeighbors(
         // If moving in the opposite direction, keep the same direction
         Direction current_direction = current.direction;
         if ((current_direction == UP && new_direction == DOWN) || (current_direction == DOWN && new_direction == UP) ||
-            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT || new_direction == STAY))
+            (current_direction == LEFT && new_direction == RIGHT) || (current_direction == RIGHT && new_direction == LEFT))
         {
             new_direction = current_direction; // Keep the same direction
         }
@@ -164,10 +165,12 @@ std::vector<std::vector<int>> AStarAlgorithm(
             {
                 std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map, following_constraint_map);
 
-                for (const auto &neighbor : neighbors)
+                for (auto &neighbor : neighbors)
                 {
+                    if (neighbor.direction == STAY)
+                        neighbor.direction = current.direction;
                     int rotation_cost_value = RotationCost(current.direction, neighbor.direction);
-                    int move_cost = 1;
+                    int move_cost = (current.position == neighbor.position) ? 1 : 2;
                     int final_g_cost = g_costs[current] + rotation_cost_value + move_cost;
                     State final_state = neighbor;
 
@@ -195,10 +198,12 @@ std::vector<std::vector<int>> AStarAlgorithm(
 
         std::vector<State> neighbors = GetNeighbors(current, goal, grid, vertex_constraint_map, edge_constraint_map, stopping_constraint_map, following_constraint_map);
 
-        for (const auto &neighbor : neighbors)
+        for (auto &neighbor : neighbors)
         {
+            if(neighbor.direction == STAY)
+                neighbor.direction = current.direction;
             int rotation_cost_value = RotationCost(current.direction, neighbor.direction);
-            int move_cost = 1;
+            int move_cost = (current.position == neighbor.position) ? 1 : 2;
             int final_g_cost = g_costs[current] + rotation_cost_value + move_cost;
             State final_state = neighbor;
 

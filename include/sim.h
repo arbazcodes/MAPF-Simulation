@@ -6,7 +6,7 @@
 #include "grid.h"
 #include "robot.h"
 
-const glm::vec2 INITIAL_VELOCITY(500.0f, 500.0f);
+const glm::vec2 INITIAL_VELOCITY(800.0f, 800.0f);
 const float RADIUS = 50.0f;
 #define ROWS 3
 #define COLS 3

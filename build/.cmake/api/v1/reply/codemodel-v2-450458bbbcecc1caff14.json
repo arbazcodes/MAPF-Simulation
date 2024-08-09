@@ -45,7 +45,7 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/Lenovo/Desktop/Sim1/build",
+		"build" : "C:/Users/Lenovo/Desktop/Simulation/build",
 		"source" : "C:/Users/Lenovo/Desktop/Breakout/include/glm"
 	},
 	"version" : 

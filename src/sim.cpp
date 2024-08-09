@@ -56,23 +56,53 @@ void Sim::Init()
 
     auto endpoints = GenerateEndpoints(NUMBER_OF_ROBOTS, ROWS, COLS);
 
-    // std::vector<Pair> starts = endpoints[0];
-    // std::vector<Pair> goals = endpoints[1];
+    std::vector<Pair> starts = endpoints[0];
+    std::vector<Pair> goals = endpoints[1];
 
-    std::vector<Pair> starts =
-        {
-            {0, 0},
-            {1, 2},
-            {2, 0},
-            {2, 2},
-        };
-    std::vector<Pair> goals =
-        {
-            {0, 2},
-            {1, 1},
-            {1, 2},
-            {2, 2},
-        };
+    // std::vector<Pair> starts =
+    //     {
+    //         {1, 1},
+    //         {2, 0},
+    //         {2, 1},
+    //         {2, 2},
+    //     };
+    // std::vector<Pair> goals =
+    //     {
+    //         {0, 0},
+    //         {0, 1},
+    //         {0, 2},
+    //         {2, 0},
+    //     };
+
+    // std::vector<Pair> starts =
+    //     {
+    //         {0, 1},
+    //         {1, 0},
+    //         {1, 1},
+    //         {2, 0},
+    //     };
+    // std::vector<Pair> goals =
+    //     {
+    //         {0, 0},
+    //         {0, 2},
+    //         {2, 1},
+    //         {2, 0},
+    //     };
+
+    // std::vector<Pair> starts =
+    //     {
+    //         {0, 0},
+    //         {1, 0},
+    //         {1, 1},
+    //         {2, 2},
+    //     };
+    // std::vector<Pair> goals =
+    //     {
+    //         {1, 0},
+    //         {1, 1},
+    //         {2, 1},
+    //         {2, 2},
+    //     };
 
     std::vector<std::vector<int>> Grid(ROWS, std::vector<int>(COLS, 1));
 

@@ -67,7 +67,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/Lenovo/Desktop/Sim1/build"
+			"value" : "c:/Users/Lenovo/Desktop/Simulation/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -599,7 +599,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Lenovo/Desktop/Sim1/build/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/Lenovo/Desktop/Simulation/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -1331,7 +1331,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/Lenovo/Desktop/Sim1/build"
+			"value" : "C:/Users/Lenovo/Desktop/Simulation/build"
 		},
 		{
 			"name" : "Project_IS_TOP_LEVEL",
