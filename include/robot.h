@@ -17,7 +17,7 @@ public:
     bool isRotating = true;
     bool isMoving = false;
     float InitialRotation, CurrentRotation, AngularVelocity;
-    bool reachedDestination, rotated;
+    bool reached, rotated, reachedGoal;
     int targetDirection, targetAngle;
 
     glm::vec2 InitialPosition, CurrentPosition, Velocity;

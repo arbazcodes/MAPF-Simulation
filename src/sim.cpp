@@ -6,6 +6,7 @@
 #include "astar.h"
 #include "cbs.h"
 #include "tapf.h"
+#include <unistd.h>
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -23,6 +24,12 @@ Sim::~Sim()
     {
         delete robot;
     }
+    Robots.clear();
+}
+
+void Sim::Clear()
+{
+    ResourceManager::Clear();
     Robots.clear();
 }
 
@@ -108,24 +115,34 @@ void Sim::Init()
 
     Cbs cbsAlgorithm(Grid);
 
-    std::vector<CostPath> solution = cbsAlgorithm.HighLevel(starts, goals);
+    auto paths = cbsAlgorithm.HighLevel(starts, goals);
 
-    for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
+    if(!paths.has_value())
     {
-        glm::vec2 InitialPosition = glm::vec2(((float)solution[i][0][0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i][0][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
-        glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
-        Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
-        Robots[i]->Path = solution[i];
+        std::cout << "TIMED OUT!!!!." << std::endl;
+        Clear();
+        Init();
+    }else{
 
-        glm::vec2 goalPosition = glm::vec2((float)goals[i].first * UnitWidth, (float)goals[i].second * UnitHeight);
-        grid.SetDestinationColor(goalPosition, robotColor);
-
-        for (const auto &step : Robots[i]->Path)
+        auto solution = paths.value();
+        for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
         {
-            std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ", " << step[3] << ") ";
+            glm::vec2 InitialPosition = glm::vec2(((float)solution[i][0][0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i][0][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
+            glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
+            Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
+            Robots[i]->Path = solution[i];
+
+            glm::vec2 goalPosition = glm::vec2((float)goals[i].first * UnitWidth, (float)goals[i].second * UnitHeight);
+            grid.SetDestinationColor(goalPosition, robotColor);
+
+            for (const auto &step : Robots[i]->Path)
+            {
+                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ", " << step[3] << ") ";
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
     }
+
 }
 
 void Sim::Update(float dt)
@@ -140,19 +157,27 @@ void Sim::Update(float dt)
             }
             else
             {
-                bool allReached = AllReachedDestination();
+                bool allReached = AllReached();
                 bool allRotated = AllRotated();
                 robot->Move(dt, this->UnitWidth, this->UnitHeight, allReached, allRotated);
             }
+        }else{
+            robot->reachedGoal = true;
         }
+    }
+    if(AllReachedGoal())
+    {
+        sleep(0.7);
+        Clear();
+        Init();
     }
 }
 
-bool Sim::AllReachedDestination()
+bool Sim::AllReached()
 {
     for (auto robot : Robots)
     {
-        if (!robot->reachedDestination && robot->currentPathIndex < robot->Path.size())
+        if (!robot->reached && robot->currentPathIndex < robot->Path.size())
             return false;
     }
 
@@ -163,6 +188,17 @@ bool Sim::AllRotated()
     for (auto robot : Robots)
     {
         if (!robot->rotated && robot->currentPathIndex < robot->Path.size())
+            return false;
+    }
+
+    return true;
+}
+
+bool Sim::AllReachedGoal()
+{
+    for (auto robot : Robots)
+    {
+        if (!robot->reachedGoal)
             return false;
     }
 

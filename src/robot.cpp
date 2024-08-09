@@ -4,14 +4,14 @@
 Robot::Robot()
     : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
-    reachedDestination = false, rotated = false;
+    reached = false, rotated = false, reachedGoal = false;
 }
 
 // Constructor with specified values
 Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
     : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(color)
 {
-    reachedDestination = false, rotated = false;
+    reached = false, rotated = false, reachedGoal = false;
 }
 
 void Robot::Rotate(float dt)
@@ -90,18 +90,18 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
 
     glm::vec2 targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
 
-    reachedDestination = glm::distance(this->CurrentPosition, targetPosition) < 1.0f;
+    reached = glm::distance(this->CurrentPosition, targetPosition) < 1.0f;
 
-    if (reachedDestination && AllRobotsReached && AllRobotsRotated)
+    if (reached && AllRobotsReached && AllRobotsRotated)
     {
         this->isRotating = true;
         this->isMoving = false;
         this->InitialPosition = CurrentPosition;
         this->currentPathIndex++;
-        reachedDestination = false;
+        reached = false;
         targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
         return;
-    } else if (reachedDestination)
+    } else if (reached)
     {
         return;
     }

@@ -33,7 +33,7 @@ public:
         const std::vector<Pair> &sources,
         const std::vector<Pair> &destinations,
         const std::vector<Constraint> &constraints) const;
-    std::vector<CostPath> HighLevel(
+    std::optional<std::vector<CostPath>>HighLevel(
         const std::vector<Pair> &sources,
         const std::vector<Pair> &destinations) const;
 

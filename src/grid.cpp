@@ -49,7 +49,7 @@ void Grid::init(std::vector<std::vector<unsigned int>> tileData, unsigned int le
         {
             glm::vec3 color = glm::vec3(1.0f); // original: white
             if (tileData[y][x] == 1)
-                color = glm::vec3(0.2f, 0.6f, 1.0f);
+                color = glm::vec3(0.5f, 0.5f, 0.6f);
             else if (tileData[y][x] == 2)
                 color = glm::vec3(0.0f, 0.7f, 0.0f);
             else if (tileData[y][x] == 3)

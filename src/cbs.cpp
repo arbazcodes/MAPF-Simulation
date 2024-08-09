@@ -268,10 +268,10 @@ std::vector<Constraint> Cbs::GenerateConstraints(const std::vector<std::vector<i
     return constraints;
 }
 
-std::vector<CostPath> Cbs::HighLevel(const std::vector<Pair> &sources, const std::vector<Pair> &destinations) const
+std::optional<std::vector<CostPath>> Cbs::HighLevel(const std::vector<Pair> &sources, const std::vector<Pair> &destinations) const
 {
     std::priority_queue<CbsNode> open;
-
+    int step = 0;
     CbsNode root;
     root.constraints = {};
 
@@ -288,6 +288,9 @@ std::vector<CostPath> Cbs::HighLevel(const std::vector<Pair> &sources, const std
 
     while (!open.empty())
     {
+        step++;
+        if(step > 1000)
+            return std::nullopt;
         CbsNode current = open.top();
         open.pop();
 

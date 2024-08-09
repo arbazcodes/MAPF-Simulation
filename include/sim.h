@@ -7,10 +7,10 @@
 #include "robot.h"
 
 const glm::vec2 INITIAL_VELOCITY(800.0f, 800.0f);
-const float RADIUS = 50.0f;
-#define ROWS 3
-#define COLS 3
-#define NUMBER_OF_ROBOTS 4
+const float RADIUS = 30.0f;
+#define ROWS 6
+#define COLS 6
+#define NUMBER_OF_ROBOTS 7
 
 class Sim
 {
@@ -24,9 +24,11 @@ public:
     void Init();
     void Update(float dt);
     void Render();
+    void Clear();
 
-    bool AllReachedDestination();
+    bool AllReached();
     bool AllRotated();
+    bool AllReachedGoal();
 
 private:
     std::vector<Robot *> Robots;
