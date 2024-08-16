@@ -115,7 +115,7 @@ void Sim::Init()
 
     Cbs cbsAlgorithm(Grid);
 
-    auto paths = cbsAlgorithm.HighLevel(starts, goals);
+    auto paths = cbsAlgorithm.HighLevel(starts, goals, false);
 
     if(!paths.has_value())
     {

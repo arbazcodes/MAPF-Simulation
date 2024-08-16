@@ -1,3 +1,5 @@
+// astar.h
+
 #ifndef ASTAR_H
 #define ASTAR_H
 
@@ -7,7 +9,7 @@
 #include <map>
 #include <set>
 
-typedef std::pair<int, int> Pair;
+using Pair = std::pair<int, int>;
 
 enum Direction
 {
@@ -28,7 +30,7 @@ struct Constraint
 
     bool operator<(const Constraint &other) const
     {
-        return std::tie(type, x, y, time) > std::tie(other.type, other.x, other.y, other.time);
+        return std::tie(type, x, y, time) < std::tie(other.type, other.x, other.y, other.time);
     }
 };
 
@@ -40,7 +42,7 @@ struct State
 
     bool operator<(const State &other) const
     {
-        return std::tie(position, direction, time_step) > std::tie(other.position, other.direction, other.time_step);
+        return std::tie(position, direction, time_step) < std::tie(other.position, other.direction, other.time_step);
     }
 };
 
@@ -54,9 +56,9 @@ std::vector<State> GetNeighbors(
     const State &current,
     const Pair &goal,
     const std::vector<std::vector<int>> &grid,
-    std::map<int, std::set<Pair>> vertex_constraint_map,
-    std::map<int, std::set<Pair>> edge_constraint_map,
-    std::vector<std::vector<int>> stopping_constraint_map,
-    std::map<int, std::set<Pair>> following_constraint_map);
+    const std::map<int, std::set<Pair>> &vertex_constraint_map,
+    const std::map<int, std::set<Pair>> &edge_constraint_map,
+    const std::vector<std::vector<int>> &stopping_constraint_map,
+    const std::map<int, std::set<Pair>> &following_constraint_map);
 
-#endif
+#endif // ASTAR_H

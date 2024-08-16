@@ -35,7 +35,7 @@ public:
         const std::vector<Constraint> &constraints) const;
     std::optional<std::vector<CostPath>>HighLevel(
         const std::vector<Pair> &sources,
-        const std::vector<Pair> &destinations) const;
+        const std::vector<Pair> &destinations, bool pruning = false) const;
 
 private:
     std::vector<std::vector<int>> grid;

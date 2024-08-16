@@ -152,53 +152,64 @@ std::vector<std::vector<int>> Cbs::FindStoppingConflicts(const std::vector<CostP
     return stopping_conflicts;
 }
 
-std::vector<std::vector<int>> Cbs::FindConflictsFollow(const std::vector<CostPath> &solution) const
+std::vector<std::vector<int>> Cbs::FindConflictsFollow(const std::vector<std::vector<std::vector<int>>> &solution) const
 {
     std::vector<std::vector<int>> Conflicts;
+    int num_paths = solution.size();
 
-    for (int i = 0; i < solution.size(); ++i)
+    for (int i = 0; i < num_paths; ++i)
     {
-        const std::vector<std::vector<int>> &path_1 = solution[i];
+        const auto &path_1 = solution[i];
+        int path_1_size = path_1.size();
+        if (path_1_size == 0)
+            continue;
 
-        for (int j = i + 1; j < solution.size(); ++j)
+        for (int j = i + 1; j < num_paths; ++j)
         {
-            const std::vector<std::vector<int>> &path_2 = solution[j];
+            const auto &path_2 = solution[j];
+            int path_2_size = path_2.size();
+            if (path_2_size == 0)
+                continue;
 
-            // Check for follow conflicts backwards
-            for (int t = 1; t < path_1.size() && t < path_2.size(); ++t)
+            int min_size = std::min(path_1_size, path_2_size);
+
+            for (int t = 0; t < min_size; ++t)
             {
-                const auto &step_1 = path_1[t];
-                const auto &step_2 = path_2[t - 1];
-
-                if (step_1.size() == 4 && step_2.size() == 4)
+                if (t < path_1_size && t > 0 && t - 1 < path_2_size)
                 {
-                    int x1 = step_1[0];
-                    int y1 = step_1[1];
-                    int x2 = step_2[0];
-                    int y2 = step_2[1];
+                    const auto &step_1 = path_1[t];
+                    const auto &step_2_back = path_2[t - 1];
 
-                    if ((x1 == x2 && y1 == y2))
+                    if (step_1.size() == 4 && step_2_back.size() == 4)
                     {
-                        Conflicts.push_back({-1, j, i, x1, y1, t - 1, t});
+                        int x1 = step_1[0];
+                        int y1 = step_1[1];
+                        int x2_back = step_2_back[0];
+                        int y2_back = step_2_back[1];
+
+                        if (x1 == x2_back && y1 == y2_back)
+                        {
+                            Conflicts.push_back({-1, j, i, x1, y1, t - 1, t});
+                        }
                     }
                 }
-            }
-            // Check for follow conflicts forwards
-            for (int t = 0; t < path_1.size() && t < path_2.size(); ++t)
-            {
-                const auto &step_1 = path_1[t];
-                const auto &step_2 = path_2[t + 1];
 
-                if (step_1.size() == 4 && step_2.size() == 4)
+                if (t + 1 < path_2_size)
                 {
-                    int x1 = step_1[0];
-                    int y1 = step_1[1];
-                    int x2 = step_2[0];
-                    int y2 = step_2[1];
+                    const auto &step_1 = path_1[t];
+                    const auto &step_2_fwd = path_2[t + 1];
 
-                    if ((x1 == x2 && y1 == y2))
+                    if (step_1.size() == 4 && step_2_fwd.size() == 4)
                     {
-                        Conflicts.push_back({-1, j, i, x1, y1, t + 1, t});
+                        int x1 = step_1[0];
+                        int y1 = step_1[1];
+                        int x2_fwd = step_2_fwd[0];
+                        int y2_fwd = step_2_fwd[1];
+
+                        if (x1 == x2_fwd && y1 == y2_fwd)
+                        {
+                            Conflicts.push_back({-1, j, i, x1, y1, t + 1, t});
+                        }
                     }
                 }
             }
@@ -268,9 +279,11 @@ std::vector<Constraint> Cbs::GenerateConstraints(const std::vector<std::vector<i
     return constraints;
 }
 
-std::optional<std::vector<CostPath>> Cbs::HighLevel(const std::vector<Pair> &sources, const std::vector<Pair> &destinations) const
+std::optional<std::vector<CostPath>> Cbs::HighLevel(const std::vector<Pair> &sources, const std::vector<Pair> &destinations, bool pruning) const
 {
     std::priority_queue<CbsNode> open;
+    std::set<CbsNode> closed = {};
+
     int step = 0;
     CbsNode root;
     root.constraints = {};
@@ -289,10 +302,14 @@ std::optional<std::vector<CostPath>> Cbs::HighLevel(const std::vector<Pair> &sou
     while (!open.empty())
     {
         step++;
-        if(step > 1000)
+        if (step > 1000)
             return std::nullopt;
         CbsNode current = open.top();
         open.pop();
+
+        if (pruning && closed.find(current) != closed.end())
+            continue;
+        if(pruning) closed.insert(current);
 
         auto conflicts = FindConflicts(current.solution);
 
