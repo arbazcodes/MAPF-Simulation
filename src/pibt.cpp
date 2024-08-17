@@ -67,8 +67,9 @@ pibt::pibt(int w, int h,
             goal_vertex,   // goal
             priorities[i], // unique priority
             false,
-            {}
-            };
+            Direction::None, // Initialize previous direction
+            {}               // Initialize path
+        };
         agent->Path.push_back({start_vertex->x, start_vertex->y, static_cast<int>(Direction::None)});
         agents.push_back(agent);
     }
@@ -97,7 +98,7 @@ Agent *pibt::FindConflictingAgent(const Vertex *v, const Agent *agent)
     return nullptr;
 }
 
-bool pibt::AllReached()
+bool pibt::allReached()
 {
     for (auto agent : agents)
     {
@@ -174,7 +175,6 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         }
 
         found_valid_move = true;
-        // std::cout << "Vertex: (" << ai->v_next->x << ", " << ai->v_next->y << ") reserved by Agent: " << ai->id << std::endl;
         break;
     }
 
@@ -193,7 +193,7 @@ void pibt::run()
         return a->priority > b->priority;
     };
 
-    while (!AllReached())
+    while (!allReached())
     {
         for (auto *agent : agents)
         {
@@ -203,7 +203,8 @@ void pibt::run()
                 agent->reached_goal = true;
             if (agent->v_next != nullptr)
             {
-                Direction direction = None;
+                Direction direction = Direction::None;
+                // Determine the direction from current to next position
                 if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y - 1)
                     direction = Direction::Up;
                 else if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y + 1)
@@ -213,7 +214,17 @@ void pibt::run()
                 else if (agent->v_next->x == agent->v_now->x + 1 && agent->v_next->y == agent->v_now->y)
                     direction = Direction::Right;
 
-                agent->Path.push_back({agent->v_next->x, agent->v_next->y, (int) direction});
+                // Maintain direction consistency for opposite moves
+                if ((direction == Direction::Up && agent->prev_direction == Direction::Down) ||
+                    (direction == Direction::Down && agent->prev_direction == Direction::Up) ||
+                    (direction == Direction::Left && agent->prev_direction == Direction::Right) ||
+                    (direction == Direction::Right && agent->prev_direction == Direction::Left))
+                {
+                    direction = agent->prev_direction; // Keep the direction of the second element
+                }
+
+                agent->Path.push_back({agent->v_next->x, agent->v_next->y, direction});
+                agent->prev_direction = direction; // Update previous direction
                 agent->v_now = agent->v_next;
                 agent->v_next = nullptr;
             }

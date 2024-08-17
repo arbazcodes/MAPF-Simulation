@@ -92,6 +92,8 @@ void Sim::Init()
             std::cout << std::endl;
         }
 
+        path_size = solution[0].size();
+
         for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
         {
             glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
@@ -118,10 +120,14 @@ void Sim::Init()
 
 void Sim::Update(float dt)
 {
+    std::cout << "gloablpathindex = " << globalPathIndex << std::endl;
+    std::cout << "pathsize = " << path_size << std::endl;
     if(AllReached() && AllRotated()){
-        globalPathIndex++;
-        for(auto robot : Robots)
-            robot->reached = false;
+        if(globalPathIndex < path_size){
+            globalPathIndex++;
+            for(auto robot : Robots)
+                robot->reached = false;
+        }
     }
     for (auto robot : Robots)
     {

@@ -55,7 +55,6 @@ void Robot::Rotate(float dt)
         this->CurrentRotation = targetAngle;
         this->isRotating = false;
         this->isMoving = true;
-        // this->rotated = false;
         return;
     }
     else
@@ -83,9 +82,6 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     if (!this->isMoving)
         return;
 
-    if (this->currentPathIndex >= Path.size())
-        return;
-
     if(!AllRobotsRotated)
         return;
 
@@ -111,7 +107,7 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
         this->InitialPosition = CurrentPosition;
         //this->currentPathIndex++;
         //reached = false;
-        //targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
+        // targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
         return;
     }
 

@@ -23,6 +23,7 @@ struct Agent
     Vertex *goal;
     float priority;
     bool reached_goal;
+    Direction prev_direction;
     std::vector<std::vector<int>> Path;
 };
 
@@ -46,7 +47,7 @@ public:
 
     bool PIBT(Agent *ai, Agent *aj = nullptr);
     Agent *FindConflictingAgent(const Vertex *v, const Agent *agent);
-    bool AllReached();
+    bool allReached();
 
 private:
     std::unordered_map<Vertex *, Agent *> occupied_now;
