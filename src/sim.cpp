@@ -75,26 +75,37 @@ void Sim::Init()
         // Run the PIBT algorithm
         planner.run();
 
+        std::vector<CostPath> solution;
+
         // Print results
         std::cout << "Final positions of agents:\n";
         for (const Agent *agent : planner.agents)
         {
-            std::cout << "Agent " << agent->id << " - Path: ";
-            for (auto vertex : agent->Path)
-                std::cout << "(" << vertex.first << ", " << vertex.second << ") ";
-            std::cout << std::endl;
-
             // Convert agent path to robot path format
             std::vector<std::vector<int>> robotPath;
-            for (auto &step : agent->Path)
-            {
-                robotPath.push_back({step.first, step.second, 0, 0}); // Convert to (x, y, 0, 0) format
+            std::cout << "Agent " << agent->id << " - Path: ";
+            for (const auto vertex : agent->Path){
+                std::cout << "(" << vertex.first << ", " << vertex.second << ") ";
+                robotPath.push_back({vertex.first, vertex.second, 0, 0});
             }
+            solution.push_back(robotPath);
+            std::cout << std::endl;
+        }
 
-            glm::vec2 InitialPosition = glm::vec2(((float)agent->Path[0].first * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)agent->Path[0].second * UnitHeight) + UnitHeight / 2 - RADIUS);
+        for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
+        {
+            glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
             Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
-            Robots.back()->Path = robotPath; // Set robot path
+            Robots[i]->Path = solution[i];
+            glm::vec2 goalPosition = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
+            grid.SetDestinationColor(goalPosition, robotColor);
+
+            for (const auto &step : Robots[i]->Path)
+            {
+                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ", " << step[3] << ") ";
+            }
+            std::cout << std::endl;
         }
     }
     catch (const std::exception &e)
@@ -102,13 +113,6 @@ void Sim::Init()
         std::cerr << "Error: " << e.what() << '\n';
         Clear();
         Init();
-    }
-
-    // Set destination colors
-    for (size_t i = 0; i < goals.size(); ++i)
-    {
-        glm::vec2 goalPosition = glm::vec2((float)goals[i].first * UnitWidth, (float)goals[i].second * UnitHeight);
-        grid.SetDestinationColor(goalPosition, Robots[i]->Color); // Correct attribute name
     }
 }
 
