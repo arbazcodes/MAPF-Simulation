@@ -7,6 +7,7 @@
 #include "cbs.h"
 #include "tapf.h"
 #include <unistd.h>
+#include "pibt.h"
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -66,83 +67,49 @@ void Sim::Init()
     std::vector<Pair> starts = endpoints[0];
     std::vector<Pair> goals = endpoints[1];
 
-    // std::vector<Pair> starts =
-    //     {
-    //         {1, 1},
-    //         {2, 0},
-    //         {2, 1},
-    //         {2, 2},
-    //     };
-    // std::vector<Pair> goals =
-    //     {
-    //         {0, 0},
-    //         {0, 1},
-    //         {0, 2},
-    //         {2, 0},
-    //     };
+    // Create a PIBT planner
+    pibt planner(COLS, ROWS, starts, goals);
 
-    // std::vector<Pair> starts =
-    //     {
-    //         {0, 1},
-    //         {1, 0},
-    //         {1, 1},
-    //         {2, 0},
-    //     };
-    // std::vector<Pair> goals =
-    //     {
-    //         {0, 0},
-    //         {0, 2},
-    //         {2, 1},
-    //         {2, 0},
-    //     };
-
-    // std::vector<Pair> starts =
-    //     {
-    //         {0, 0},
-    //         {1, 0},
-    //         {1, 1},
-    //         {2, 2},
-    //     };
-    // std::vector<Pair> goals =
-    //     {
-    //         {1, 0},
-    //         {1, 1},
-    //         {2, 1},
-    //         {2, 2},
-    //     };
-
-    std::vector<std::vector<int>> Grid(ROWS, std::vector<int>(COLS, 1));
-
-    Cbs cbsAlgorithm(Grid);
-
-    auto paths = cbsAlgorithm.HighLevel(starts, goals, false);
-
-    if(!paths.has_value())
+    try
     {
-        std::cout << "TIMED OUT!!!!." << std::endl;
-        Clear();
-        Init();
-    }else{
+        // Run the PIBT algorithm
+        planner.run();
 
-        auto solution = paths.value();
-        for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
+        // Print results
+        std::cout << "Final positions of agents:\n";
+        for (const Agent *agent : planner.agents)
         {
-            glm::vec2 InitialPosition = glm::vec2(((float)solution[i][0][0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i][0][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
+            std::cout << "Agent " << agent->id << " - Path: ";
+            for (auto vertex : agent->Path)
+                std::cout << "(" << vertex.first << ", " << vertex.second << ") ";
+            std::cout << std::endl;
+
+            // Convert agent path to robot path format
+            std::vector<std::vector<int>> robotPath;
+            for (auto &step : agent->Path)
+            {
+                robotPath.push_back({step.first, step.second, 0, 0}); // Convert to (x, y, 0, 0) format
+            }
+
+            glm::vec2 InitialPosition = glm::vec2(((float)agent->Path[0].first * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)agent->Path[0].second * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
             Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
-            Robots[i]->Path = solution[i];
-
-            glm::vec2 goalPosition = glm::vec2((float)goals[i].first * UnitWidth, (float)goals[i].second * UnitHeight);
-            grid.SetDestinationColor(goalPosition, robotColor);
-
-            for (const auto &step : Robots[i]->Path)
-            {
-                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ", " << step[3] << ") ";
-            }
-            std::cout << std::endl;
+            Robots.back()->Path = robotPath; // Set robot path
         }
     }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << '\n';
+        Clear();
+        Init();
+    }
 
+    // Set destination colors
+    for (size_t i = 0; i < goals.size(); ++i)
+    {
+        glm::vec2 goalPosition = glm::vec2((float)goals[i].first * UnitWidth, (float)goals[i].second * UnitHeight);
+        grid.SetDestinationColor(goalPosition, Robots[i]->Color); // Correct attribute name
+    }
 }
 
 void Sim::Update(float dt)
