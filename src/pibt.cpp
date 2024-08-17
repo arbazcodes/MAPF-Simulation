@@ -3,8 +3,8 @@
 #include <iostream>
 #include <random>
 #include <unordered_map>
-#include <algorithm> // For std::shuffle and std::sort
-#include <random>    // For std::random_device and std::mt19937
+#include <algorithm>
+#include <random>
 
 int pibt::HeuristicDistance(const Vertex *start, const Vertex *goal)
 {
@@ -62,22 +62,19 @@ pibt::pibt(int w, int h,
         Agent *agent = new Agent{
             static_cast<int>(i), // id
             start_vertex,        // current location
-            nullptr,
-            start_vertex,  // next location
-            goal_vertex,   // goal
-            priorities[i], // unique priority
-            false,
-            Direction::None, // Initialize previous direction
-            {}               // Initialize path
+            nullptr,             // next location
+            start_vertex,        // start
+            goal_vertex,         // goal
+            priorities[i],       // unique priority
+            false,               // reached goal
+            Direction::Up,       // initialize previous direction
+            {}                   // initialize path
         };
-        agent->Path.push_back({start_vertex->x, start_vertex->y, static_cast<int>(Direction::None)});
+        agent->Path.push_back({start_vertex->x, start_vertex->y, Direction::Up});
         agents.push_back(agent);
     }
-
-    // PrintAgents();
 }
 
-// Destructor implementation
 pibt::~pibt()
 {
     for (Agent *agent : agents)
@@ -220,7 +217,7 @@ void pibt::run()
                     (direction == Direction::Left && agent->prev_direction == Direction::Right) ||
                     (direction == Direction::Right && agent->prev_direction == Direction::Left) || direction == Direction::None)
                 {
-                    direction = agent->prev_direction; // Keep the direction of the second element
+                    direction = agent->prev_direction;
                 }
 
                 agent->Path.push_back({agent->v_next->x, agent->v_next->y, direction});

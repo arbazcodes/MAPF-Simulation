@@ -129,9 +129,9 @@ void Sim::Update(float dt)
     }
     for (auto robot : Robots)
     {
-        robot->currentPathIndex = globalPathIndex;
-        if (robot->currentPathIndex < robot->Path.size())
+        if (globalPathIndex < robot->Path.size())
         {
+            robot->currentPathIndex = globalPathIndex;
             if (robot->isRotating)
             {
                 robot->Rotate(dt);
