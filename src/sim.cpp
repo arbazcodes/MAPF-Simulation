@@ -3,8 +3,6 @@
 #include "sprite_renderer.h"
 #include "sim_object.h"
 #include "robot.h"
-#include "astar.h"
-#include "cbs.h"
 #include "tapf.h"
 #include <unistd.h>
 #include "pibt.h"
@@ -12,6 +10,8 @@
 // Game-related State data
 SpriteRenderer *Renderer;
 std::vector<glm::vec2> InitialPositions;
+
+using CostPath = std::vector<std::vector<int>>;
 
 Sim::Sim(unsigned int width, unsigned int height)
     : Width(width), Height(height)

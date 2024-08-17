@@ -4,7 +4,8 @@
 #include <algorithm>
 #include <iterator>
 #include <set>
-#include "cbs.h"
+
+using Pair = std::pair<int, int>;
 
 std::vector<Pair> GenerateUniqueRandomPositions(int num_positions, int grid_rows, int grid_cols, std::mt19937 &rng);
 void EnsureUniqueStartAndGoal(std::vector<Pair> &starts, std::vector<Pair> &goals, std::mt19937 &rng, int grid_rows, int grid_cols);
