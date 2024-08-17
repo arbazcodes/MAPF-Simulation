@@ -86,7 +86,7 @@ void Sim::Init()
             std::cout << "Agent " << agent->id << " - Path: ";
             for (const auto vertex : agent->Path){
                 std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
-                robotPath.push_back({vertex[0], vertex[1], vertex[2], 0});
+                robotPath.push_back({vertex[0], vertex[1], vertex[2]});
             }
             solution.push_back(robotPath);
             std::cout << std::endl;
@@ -103,7 +103,7 @@ void Sim::Init()
 
             for (const auto &step : Robots[i]->Path)
             {
-                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ", " << step[3] << ") ";
+                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
             }
             std::cout << std::endl;
         }
@@ -128,11 +128,11 @@ void Sim::Update(float dt)
         robot->currentPathIndex = globalPathIndex;
         if (robot->currentPathIndex < robot->Path.size())
         {
-            // if (robot->isRotating)
-            // {
-            //     robot->Rotate(dt);
-            // }
-            // else
+            if (robot->isRotating)
+            {
+                robot->Rotate(dt);
+            }
+            else
             {
                 bool allReached = AllReached();
                 bool allRotated = AllRotated();

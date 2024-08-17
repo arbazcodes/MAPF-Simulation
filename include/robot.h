@@ -14,8 +14,8 @@ class Robot
 public:
     float Radius;
     Texture2D Sprite;
-    bool isRotating = false;
-    bool isMoving = true;
+    bool isRotating = true;
+    bool isMoving = false;
     float InitialRotation, CurrentRotation, AngularVelocity;
     bool reached, rotated, reachedGoal;
     int targetDirection, targetAngle;
