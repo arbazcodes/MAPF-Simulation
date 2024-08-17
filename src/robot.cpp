@@ -25,19 +25,19 @@ void Robot::Rotate(float dt)
     {
     case 0:
         targetAngle = 0.0f;
-        break; // Facing right
+        break; // Facing up
     case 1:
         targetAngle = 180.0f;
-        break; // Facing left
+        break; // Facing down
     case 2:
         targetAngle = -90.0f;
-        break; // Facing up
+        break; // Facing left
     case 3:
         targetAngle = 90.0f;
-        break;
+        break; // Facing right
     case 4:
         targetAngle = CurrentRotation;
-        break; // Facing dow
+        break; // Staying
     default:
         return; // Invalid direction
     }

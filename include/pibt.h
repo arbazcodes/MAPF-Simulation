@@ -4,6 +4,15 @@
 #include <vector>
 #include <unordered_map>
 
+enum Direction
+{
+    Up,
+    Down,
+    Left,
+    Right,
+    None
+};
+
 // PIBT agent
 struct Agent
 {
@@ -14,7 +23,7 @@ struct Agent
     Vertex *goal;
     float priority;
     bool reached_goal;
-    std::vector<std::pair<int, int>> Path;
+    std::vector<std::vector<int>> Path;
 };
 
 // Alias for a collection of agents

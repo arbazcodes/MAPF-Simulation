@@ -85,8 +85,8 @@ void Sim::Init()
             std::vector<std::vector<int>> robotPath;
             std::cout << "Agent " << agent->id << " - Path: ";
             for (const auto vertex : agent->Path){
-                std::cout << "(" << vertex.first << ", " << vertex.second << ") ";
-                robotPath.push_back({vertex.first, vertex.second, 0, 0});
+                std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
+                robotPath.push_back({vertex[0], vertex[1], vertex[2], 0});
             }
             solution.push_back(robotPath);
             std::cout << std::endl;

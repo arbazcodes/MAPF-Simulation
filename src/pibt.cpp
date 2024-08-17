@@ -67,8 +67,9 @@ pibt::pibt(int w, int h,
             goal_vertex,   // goal
             priorities[i], // unique priority
             false,
-            {std::make_pair(start_vertex->x, start_vertex->y)}};
-
+            {}
+            };
+        agent->Path.push_back({start_vertex->x, start_vertex->y, static_cast<int>(Direction::None)});
         agents.push_back(agent);
     }
 
@@ -202,15 +203,23 @@ void pibt::run()
                 agent->reached_goal = true;
             if (agent->v_next != nullptr)
             {
-                agent->Path.push_back(std::make_pair(agent->v_next->x, agent->v_next->y));
+                Direction direction = None;
+                if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y - 1)
+                    direction = Direction::Up;
+                else if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y + 1)
+                    direction = Direction::Down;
+                else if (agent->v_next->x == agent->v_now->x - 1 && agent->v_next->y == agent->v_now->y)
+                    direction = Direction::Left;
+                else if (agent->v_next->x == agent->v_now->x + 1 && agent->v_next->y == agent->v_now->y)
+                    direction = Direction::Right;
+
+                agent->Path.push_back({agent->v_next->x, agent->v_next->y, (int) direction});
                 agent->v_now = agent->v_next;
                 agent->v_next = nullptr;
             }
         }
 
         std::sort(agents.begin(), agents.end(), compare);
-
-        // PrintAgents();
 
         for (auto *agent : agents)
         {
