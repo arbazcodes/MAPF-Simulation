@@ -14,8 +14,8 @@ class Robot
 public:
     float Radius;
     Texture2D Sprite;
-    bool isRotating = true;
-    bool isMoving = false;
+    bool isRotating = false;
+    bool isMoving = true;
     float InitialRotation, CurrentRotation, AngularVelocity;
     bool reached, rotated, reachedGoal;
     int targetDirection, targetAngle;
@@ -23,7 +23,7 @@ public:
     glm::vec2 InitialPosition, CurrentPosition, Velocity;
     glm::vec3 Color; // New attribute for color
     std::vector<std::vector<int>> Path;
-    int currentPathIndex = 1;
+    int currentPathIndex;
 
     Robot();
     Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color);

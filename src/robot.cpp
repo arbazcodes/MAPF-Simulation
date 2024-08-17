@@ -4,14 +4,14 @@
 Robot::Robot()
     : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
-    reached = false, rotated = false, reachedGoal = false;
+    reached = false, rotated = true, reachedGoal = false;
 }
 
 // Constructor with specified values
 Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
     : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(color)
 {
-    reached = false, rotated = false, reachedGoal = false;
+    reached = false, rotated = true, reachedGoal = false;
 }
 
 void Robot::Rotate(float dt)
@@ -85,24 +85,29 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     if (this->currentPathIndex >= Path.size())
         return;
 
-    int x = this->Path[currentPathIndex][0] - this->Path[currentPathIndex - 1][0];
-    int y = this->Path[currentPathIndex][1] - this->Path[currentPathIndex - 1][1];
+    int x, y;
+
+    if(!reached){
+        x = this->Path[currentPathIndex][0] - this->Path[currentPathIndex - 1][0];
+        y = this->Path[currentPathIndex][1] - this->Path[currentPathIndex - 1][1];
+    }else{
+        x = 0;
+        y = 0;
+    }
+
 
     glm::vec2 targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
 
     reached = glm::distance(this->CurrentPosition, targetPosition) < 1.0f;
 
-    if (reached && AllRobotsReached && AllRobotsRotated)
+    if (reached)
     {
-        this->isRotating = true;
-        this->isMoving = false;
+        //this->isRotating = true;
+        //this->isMoving = false;
         this->InitialPosition = CurrentPosition;
-        this->currentPathIndex++;
-        reached = false;
-        targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
-        return;
-    } else if (reached)
-    {
+        //this->currentPathIndex++;
+        //reached = false;
+        //targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
         return;
     }
 

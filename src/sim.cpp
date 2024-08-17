@@ -112,21 +112,27 @@ void Sim::Init()
     {
         std::cerr << "Error: " << e.what() << '\n';
         Clear();
-        Init();
+        //Init();
     }
 }
 
 void Sim::Update(float dt)
 {
+    if(AllReached() && AllRotated()){
+        globalPathIndex++;
+        for(auto robot : Robots)
+            robot->reached = false;
+    }
     for (auto robot : Robots)
     {
+        robot->currentPathIndex = globalPathIndex;
         if (robot->currentPathIndex < robot->Path.size())
         {
-            if (robot->isRotating)
-            {
-                robot->Rotate(dt);
-            }
-            else
+            // if (robot->isRotating)
+            // {
+            //     robot->Rotate(dt);
+            // }
+            // else
             {
                 bool allReached = AllReached();
                 bool allRotated = AllRotated();
@@ -136,12 +142,12 @@ void Sim::Update(float dt)
             robot->reachedGoal = true;
         }
     }
-    if(AllReachedGoal())
-    {
-        sleep(0.7);
-        Clear();
-        Init();
-    }
+    // if(AllReachedGoal())
+    // {
+    //     sleep(5);
+    //     Clear();
+    //     //Init();
+    // }
 }
 
 bool Sim::AllReached()

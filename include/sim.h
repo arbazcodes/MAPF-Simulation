@@ -18,6 +18,7 @@ public:
     unsigned int Width, Height;
     float UnitWidth, UnitHeight;
     Grid grid;
+    int globalPathIndex = 1;
 
     Sim(unsigned int width, unsigned int height);
     ~Sim();
