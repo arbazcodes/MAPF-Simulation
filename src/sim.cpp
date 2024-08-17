@@ -120,8 +120,6 @@ void Sim::Init()
 
 void Sim::Update(float dt)
 {
-    std::cout << "gloablpathindex = " << globalPathIndex << std::endl;
-    std::cout << "pathsize = " << path_size << std::endl;
     if(AllReached() && AllRotated()){
         if(globalPathIndex < path_size){
             globalPathIndex++;
@@ -160,7 +158,7 @@ bool Sim::AllReached()
 {
     for (auto robot : Robots)
     {
-        if (!robot->reached && robot->currentPathIndex < robot->Path.size())
+        if (!robot->reached)
             return false;
     }
 
@@ -170,7 +168,7 @@ bool Sim::AllRotated()
 {
     for (auto robot : Robots)
     {
-        if (!robot->rotated && robot->currentPathIndex < robot->Path.size())
+        if (!robot->rotated)
             return false;
     }
 

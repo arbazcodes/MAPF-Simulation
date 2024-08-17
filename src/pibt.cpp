@@ -218,7 +218,7 @@ void pibt::run()
                 if ((direction == Direction::Up && agent->prev_direction == Direction::Down) ||
                     (direction == Direction::Down && agent->prev_direction == Direction::Up) ||
                     (direction == Direction::Left && agent->prev_direction == Direction::Right) ||
-                    (direction == Direction::Right && agent->prev_direction == Direction::Left))
+                    (direction == Direction::Right && agent->prev_direction == Direction::Left) || direction == Direction::None)
                 {
                     direction = agent->prev_direction; // Keep the direction of the second element
                 }
