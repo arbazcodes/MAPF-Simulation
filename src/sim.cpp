@@ -124,7 +124,11 @@ void Sim::Update(float dt)
         if(globalPathIndex < path_size){
             globalPathIndex++;
             for(auto robot : Robots)
+            {
+                robot->isRotating = true;
+                robot->isMoving = false;
                 robot->reached = false;
+            }
         }
     }
     for (auto robot : Robots)
@@ -136,7 +140,7 @@ void Sim::Update(float dt)
             {
                 robot->Rotate(dt);
             }
-            else
+            else if(robot->isMoving)
             {
                 bool allReached = AllReached();
                 bool allRotated = AllRotated();

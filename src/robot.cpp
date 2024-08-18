@@ -16,10 +16,8 @@ Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, 
 
 void Robot::Rotate(float dt)
 {
-    if (this->currentPathIndex >= Path.size())
-        return; // No rotation needed if no path remaining
 
-    targetDirection = Path[this->currentPathIndex][2];
+    targetDirection = Path[currentPathIndex][2];
 
     switch (targetDirection)
     {
@@ -50,13 +48,12 @@ void Robot::Rotate(float dt)
     while (angleDiff < -180.0f)
         angleDiff += 360.0f;
 
-    // Determine if the rotation is complete
-    if (std::abs(angleDiff) < 1.0f)
+    rotated = std::abs(angleDiff) < 1.0f;
+    if (rotated)
     {
         this->CurrentRotation = targetAngle;
         this->isRotating = false;
         this->isMoving = true;
-        rotated = true;
         return;
     }
 
@@ -65,8 +62,8 @@ void Robot::Rotate(float dt)
     if (std::abs(angleDiff) < rotationSpeed)
     {
         this->CurrentRotation = targetAngle;
-        this->isRotating = false;
-        this->isMoving = true;
+        // this->isRotating = false;
+        // this->isMoving = true;
         rotated = true;
     }
     else
