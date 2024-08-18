@@ -23,6 +23,7 @@ struct Agent
     Vertex *goal;
     float priority;
     bool reached_goal;
+    Direction current_direction;
     Direction prev_direction;
     std::vector<std::vector<int>> Path;
 };
