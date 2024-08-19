@@ -76,7 +76,7 @@ std::vector<std::vector<Pair>> GenerateEndpoints(int num_agents, int grid_rows, 
     auto starts = GenerateUniqueRandomPositions(num_agents, grid_rows, grid_cols, rng);
     auto goals = GenerateUniqueRandomPositions(num_agents, grid_rows, grid_cols, rng);
 
-    EnsureUniqueStartAndGoal(starts, goals, rng, grid_rows, grid_cols);
+    // EnsureUniqueStartAndGoal(starts, goals, rng, grid_rows, grid_cols);
 
     return {{starts}, {goals}};
 }

@@ -2,14 +2,14 @@
 
 // Constructor with default values
 Robot::Robot()
-    : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
+    : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
     reached = false, rotated = false, reachedGoal = false;
 }
 
 // Constructor with specified values
 Robot::Robot(glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
-    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(600.0f), Color(color)
+    : InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(color)
 {
     reached = false, rotated = false, reachedGoal = false;
 }

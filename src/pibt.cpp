@@ -2,9 +2,6 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
-#include <unordered_map>
-#include <algorithm>
-#include <random>
 
 int pibt::HeuristicDistance(const Vertex *start, const Vertex *goal)
 {
@@ -67,11 +64,11 @@ pibt::pibt(int w, int h,
             goal_vertex,         // goal
             priorities[i],       // unique priority
             false,               // reached goal
-            Direction::Up,       // initialize current direction
-            Direction::Up,       // initialize previous direction
+            Direction::None,     // initialize current direction
+            Direction::None,     // initialize previous direction
             {}                   // initialize path
         };
-        agent->Path.push_back({start_vertex->x, start_vertex->y, Direction::Up});
+        agent->Path.push_back({start_vertex->x, start_vertex->y, Direction::None});
         agents.push_back(agent);
     }
 }
@@ -130,6 +127,12 @@ void pibt::PrintAgents()
 // Function to determine next move for an agent
 bool pibt::PIBT(Agent *ai, Agent *aj)
 {
+    float ai_original_priority = ai->priority;
+    if (aj)
+    {
+        ai->priority = std::max(ai->priority, aj->priority);
+    }
+
     auto compare = [&](Vertex *const v, Vertex *const u)
     {
         int d_v = HeuristicDistance(v, ai->goal);
@@ -163,12 +166,11 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         ai->v_next = u;
         Agent *conflicting_agent = FindConflictingAgent(u, ai);
 
-        if (conflicting_agent)
+        if (conflicting_agent && conflicting_agent->priority < ai->priority)
         {
             if (!PIBT(conflicting_agent, ai))
             {
-                ai->v_next = ai->v_now; // Revert move if conflict resolution failed
-                return false;
+                continue;
             }
         }
 
@@ -181,6 +183,7 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         ai->v_next = ai->v_now;
     }
 
+    ai->priority = ai_original_priority;
     return found_valid_move;
 }
 
@@ -199,10 +202,11 @@ void pibt::run()
                 agent->priority++;
             else
                 agent->reached_goal = true;
+
             if (agent->v_next != nullptr)
             {
                 agent->current_direction = Direction::None;
-                // Determine the direction from current to next position
+
                 if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y - 1)
                     agent->current_direction = Direction::Up;
                 else if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y + 1)
@@ -216,8 +220,7 @@ void pibt::run()
                 if ((agent->current_direction == Direction::Up && agent->prev_direction == Direction::Down) ||
                     (agent->current_direction == Direction::Down && agent->prev_direction == Direction::Up) ||
                     (agent->current_direction == Direction::Left && agent->prev_direction == Direction::Right) ||
-                    (agent->current_direction == Direction::Right && agent->prev_direction == Direction::Left) || 
-                    (agent->current_direction == Direction::None))
+                    (agent->current_direction == Direction::Right && agent->prev_direction == Direction::Left))
                 {
                     agent->current_direction = agent->prev_direction;
                 }
