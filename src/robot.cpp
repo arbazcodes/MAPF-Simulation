@@ -2,7 +2,7 @@
 
 // Constructor with default values
 Robot::Robot()
-    : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
+    : InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(300.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
     reached = false, rotated = false, reachedGoal = false;
 }

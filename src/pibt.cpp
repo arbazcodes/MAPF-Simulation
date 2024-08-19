@@ -158,7 +158,19 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
             }
         }
 
-        if (vertex_conflict || (aj && aj->v_now == u))
+        bool follow_conflict = false;
+        for (auto ak : agents)
+        {
+            if (ak->v_now == u && ak->id != ai->id)
+            {
+                follow_conflict = true;
+                break;
+            }
+        }
+
+        follow_conflict = false;
+
+        if (vertex_conflict || follow_conflict || (aj && aj->v_now == u))
         {
             continue;
         }

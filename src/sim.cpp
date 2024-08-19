@@ -36,7 +36,7 @@ void Sim::Clear()
 
 void Sim::Init()
 {
-    ResourceManager::LoadShader("C:/Users/Lenovo/Desktop/Simulation/shaders/sprite.vs", "C:/Users/Lenovo/Desktop/Simulation/shaders/sprite.fs", nullptr, "sprite");
+    ResourceManager::LoadShader("C:/Users/Lenovo/Desktop/Simulation - Copy/shaders/sprite.vs", "C:/Users/Lenovo/Desktop/Simulation/shaders/sprite.fs", nullptr, "sprite");
 
     // configure shaders
     glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width),
@@ -48,12 +48,12 @@ void Sim::Init()
     Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
     // load textures
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/background.jpg", false, "background");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/robot.png", true, "robot");
-    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation/textures/block.png", false, "block");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation - Copy/textures/background.jpg", false, "background");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation - Copy/textures/robot.png", true, "robot");
+    ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation - Copy/textures/block.png", false, "block");
 
     // load grid
-    grid.Load("C:/Users/Lenovo/Desktop/Simulation/levels/one.lvl", this->Width, this->Height);
+    grid.Load("C:/Users/Lenovo/Desktop/Simulation - Copy/levels/one.lvl", this->Width, this->Height);
     this->UnitWidth = grid.unitWidth;
     this->UnitHeight = grid.unitHeight;
 
