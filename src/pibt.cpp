@@ -232,7 +232,8 @@ void pibt::run()
                 if ((agent->current_direction == Direction::Up && agent->prev_direction == Direction::Down) ||
                     (agent->current_direction == Direction::Down && agent->prev_direction == Direction::Up) ||
                     (agent->current_direction == Direction::Left && agent->prev_direction == Direction::Right) ||
-                    (agent->current_direction == Direction::Right && agent->prev_direction == Direction::Left))
+                    (agent->current_direction == Direction::Right && agent->prev_direction == Direction::Left) ||
+                    (agent->current_direction == Direction::None))
                 {
                     agent->current_direction = agent->prev_direction;
                 }
