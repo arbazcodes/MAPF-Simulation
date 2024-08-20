@@ -10,7 +10,7 @@ const glm::vec2 INITIAL_VELOCITY(300.0f, 300.0f);
 const float RADIUS = 30.0f;
 #define ROWS 6
 #define COLS 6
-#define NUMBER_OF_ROBOTS 10
+#define NUMBER_OF_ROBOTS 30
 
 class Sim
 {

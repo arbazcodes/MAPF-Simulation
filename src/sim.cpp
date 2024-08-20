@@ -109,18 +109,18 @@ void Sim::Init()
         std::vector<CostPath> solution;
 
         // Print results
-        std::cout << "Final positions of agents:\n";
+        // std::cout << "Final positions of agents:\n";
         for (const Agent *agent : planner->agents)
         {
             // Convert agent path to robot path format
             std::vector<std::vector<int>> robotPath;
-            std::cout << "Agent " << agent->id << " - Path: ";
+            // std::cout << "Agent " << agent->id << " - Path: ";
             for (const auto vertex : agent->Path){
-                std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
+                // std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
                 robotPath.push_back({vertex[0], vertex[1], vertex[2]});
             }
             solution.push_back(robotPath);
-            std::cout << std::endl;
+            // std::cout << std::endl;
         }
 
         path_size = solution[0].size();
@@ -134,11 +134,11 @@ void Sim::Init()
             glm::vec2 goalPosition = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
             grid.SetDestinationColor(goalPosition, robotColor);
 
-            for (const auto &step : Robots[i]->Path)
-            {
-                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
-            }
-            std::cout << std::endl;
+            // for (const auto &step : Robots[i]->Path)
+            // {
+            //     std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
+            // }
+            // std::cout << std::endl;
         }
 
         std::cout << "\nDensity (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl;

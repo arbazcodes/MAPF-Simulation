@@ -51,7 +51,7 @@ std::vector<Vertex *> Graph::GetNeighbors(const Vertex *v)
                 }
             }
 
-            if (neighbor_vertex && !locations.count(neighbor_vertex))
+            if (neighbor_vertex)
             {
                 neighbors.push_back(neighbor_vertex);
             }
