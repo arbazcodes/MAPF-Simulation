@@ -2,7 +2,6 @@
 
 #include "graph.h"
 #include <vector>
-#include <unordered_map>
 
 // PIBT agent
 struct Agent
@@ -45,9 +44,6 @@ public:
     bool allReached();
 
 private:
-    std::unordered_map<Vertex *, Agent *> occupied_now;
-    std::unordered_map<Vertex *, Agent *> occupied_next;
-
     int HeuristicDistance(const Vertex *start, const Vertex *goal, Direction current_direction);
     void PrintAgents();
 };
