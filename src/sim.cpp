@@ -109,6 +109,8 @@ void Sim::Init()
             }
             std::cout << std::endl;
         }
+
+        std::cout << "Density (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl << std::endl;
     }
     catch (const std::exception &e)
     {

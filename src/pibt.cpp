@@ -146,6 +146,8 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
 
     bool found_valid_move = false;
 
+    bool tried_backtracking = false;
+
     for (Vertex *u : candidates)
     {
         bool vertex_conflict = false;
@@ -158,19 +160,26 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
             }
         }
 
+        bool higher_priority_conflict = false;
+        for (auto ak : agents)
+        {
+            if (ak->v_now == u && ak->id != ai->id && ak->priority >= ai->priority)
+            {
+                higher_priority_conflict = true;
+                break;
+            }
+        }
+
         bool follow_conflict = false;
         for (auto ak : agents)
         {
-            if (ak->v_now == u && ak->id != ai->id)
-            {
+            if (ak->id != ai->id && ak->v_next != nullptr && ak->v_now == u) {
                 follow_conflict = true;
                 break;
             }
         }
 
-        follow_conflict = false;
-
-        if (vertex_conflict || follow_conflict || (aj && aj->v_now == u))
+        if (vertex_conflict || higher_priority_conflict || follow_conflict || (aj && aj->v_now == u))
         {
             continue;
         }
@@ -178,16 +187,34 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         ai->v_next = u;
         Agent *conflicting_agent = FindConflictingAgent(u, ai);
 
+        bool priority_inherit_done = false;
+
         if (conflicting_agent && conflicting_agent->priority < ai->priority)
         {
+            tried_backtracking = true;
+
             if (!PIBT(conflicting_agent, ai))
             {
+                priority_inherit_done = false;
                 continue;
+            } else {
+                priority_inherit_done = true;
             }
         }
 
-        found_valid_move = true;
-        break;
+        if(!tried_backtracking) {
+            found_valid_move = true;
+            break;
+        } else {
+            if(priority_inherit_done) {
+                ai->v_next = ai->v_now;
+                found_valid_move = true;
+                break;
+            } else {
+                ai->v_next = nullptr;
+                continue;
+            }
+        }
     }
 
     if (!found_valid_move)

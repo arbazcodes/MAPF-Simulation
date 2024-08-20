@@ -6,11 +6,11 @@
 #include "grid.h"
 #include "robot.h"
 
-const glm::vec2 INITIAL_VELOCITY(1000.0f, 1000.0f);
-const float RADIUS = 20.0f;
-#define ROWS 8
-#define COLS 8
-#define NUMBER_OF_ROBOTS 64
+const glm::vec2 INITIAL_VELOCITY(100.0f, 100.0f);
+const float RADIUS = 30.0f;
+#define ROWS 6
+#define COLS 6
+#define NUMBER_OF_ROBOTS 25
 
 class Sim
 {
