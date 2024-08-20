@@ -1,6 +1,8 @@
 #include "graph.h"
 #include <iostream>
 #include <stdexcept>
+#include <queue>
+#include <unordered_map>
 
 Graph::Graph(int w, int h)
     : width(w), height(h)
@@ -31,8 +33,6 @@ std::vector<Vertex *> Graph::GetNeighbors(const Vertex *v)
     int dx[] = {0, 0, -1, 1};
     int dy[] = {-1, 1, 0, 0};
 
-    std::vector<Direction> direction_vector = {Direction::Up, Direction::Down, Direction::Left, Direction::Right};
-
     for (int i = 0; i < 4; ++i)
     {
         int nx = v->x + dx[i];
@@ -40,22 +40,24 @@ std::vector<Vertex *> Graph::GetNeighbors(const Vertex *v)
 
         if (nx >= 0 && ny >= 0 && nx < width && ny < height)
         {
-            Vertex *neighbor = nullptr;
+            Vertex neighbor(nx, ny);
+            Vertex *neighbor_vertex = nullptr;
             for (Vertex *vert : locations)
             {
                 if (vert->x == nx && vert->y == ny)
                 {
-                    neighbor = vert;
-                    neighbor->direction = direction_vector[i];
+                    neighbor_vertex = vert;
                     break;
                 }
             }
-            if (neighbor)
+
+            if (neighbor_vertex && !locations.count(neighbor_vertex))
             {
-                neighbors.push_back(neighbor);
+                neighbors.push_back(neighbor_vertex);
             }
         }
     }
 
     return neighbors;
 }
+
