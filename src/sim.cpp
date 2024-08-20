@@ -6,6 +6,7 @@
 #include "tapf.h"
 #include <unistd.h>
 #include "pibt.h"
+#include <chrono>
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -68,18 +69,48 @@ void Sim::Init()
     std::vector<Pair> goals = endpoints[1];
 
     // Create a PIBT planner
-    pibt planner(COLS, ROWS, starts, goals);
+    pibt  *planner;
 
     try
     {
-        // Run the PIBT algorithm
-        planner.run();
+        int recursive_run = 0;
+        int failure_count = 0;
+        std::chrono::duration<double> total_duration(0);
+        std::chrono::_V2::system_clock::time_point start_time;
+
+        while (recursive_run < 10)
+        {
+            start_time = std::chrono::high_resolution_clock::now();
+            // Create a new planner instance
+            planner = new pibt(COLS, ROWS, starts, goals);
+            // Run the PIBT algorithm with a timeout
+            planner->timesteps = 0;
+            planner->failed = false; // Reset failure flag
+            planner->run();
+
+            if (planner->failed)
+            {
+                recursive_run += 1;
+                if (recursive_run == 10)
+                {
+                    // failure_count++;
+                    std::cout << "Failed or Timed Out!\n";
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> iteration_duration = end_time - start_time;
+        total_duration += iteration_duration;
 
         std::vector<CostPath> solution;
 
         // Print results
         std::cout << "Final positions of agents:\n";
-        for (const Agent *agent : planner.agents)
+        for (const Agent *agent : planner->agents)
         {
             // Convert agent path to robot path format
             std::vector<std::vector<int>> robotPath;
@@ -110,7 +141,8 @@ void Sim::Init()
             std::cout << std::endl;
         }
 
-        std::cout << "Density (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl << std::endl;
+        std::cout << "\nDensity (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl;
+        std::cout << "Iteration Time: " << iteration_duration.count() << " seconds" << std::endl;
     }
     catch (const std::exception &e)
     {

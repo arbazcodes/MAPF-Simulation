@@ -3,12 +3,21 @@
 #include <vector>
 #include <unordered_set>
 
+enum Direction
+{
+    Up,
+    Down,
+    Left,
+    Right,
+    None
+};
+
 struct Vertex
 {
-    int x, y, time_occupied;
-    bool occupied;
+    int x, y;
+    Direction direction;
     Vertex() = default;
-    Vertex(int a, int b) : x(a), y(b), time_occupied(-1), occupied(false) {}
+    Vertex(int a, int b) : x(a), y(b) {}
 };
 
 class Graph

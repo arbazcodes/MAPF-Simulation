@@ -31,6 +31,8 @@ std::vector<Vertex *> Graph::GetNeighbors(const Vertex *v)
     int dx[] = {0, 0, -1, 1};
     int dy[] = {-1, 1, 0, 0};
 
+    std::vector<Direction> direction_vector = {Direction::Up, Direction::Down, Direction::Left, Direction::Right};
+
     for (int i = 0; i < 4; ++i)
     {
         int nx = v->x + dx[i];
@@ -44,6 +46,7 @@ std::vector<Vertex *> Graph::GetNeighbors(const Vertex *v)
                 if (vert->x == nx && vert->y == ny)
                 {
                     neighbor = vert;
+                    neighbor->direction = direction_vector[i];
                     break;
                 }
             }

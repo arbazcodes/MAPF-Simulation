@@ -4,15 +4,6 @@
 #include <vector>
 #include <unordered_map>
 
-enum Direction
-{
-    Up,
-    Down,
-    Left,
-    Right,
-    None
-};
-
 // PIBT agent
 struct Agent
 {
@@ -22,9 +13,9 @@ struct Agent
     Vertex *start;
     Vertex *goal;
     float priority;
+    // float tie_breaker;
     bool reached_goal;
     Direction current_direction;
-    Direction prev_direction;
     std::vector<std::vector<int>> Path;
 };
 
@@ -35,6 +26,9 @@ using Agents = std::vector<Agent *>;
 class pibt
 {
 public:
+    int timesteps = 0;
+    bool failed = false;
+
     Graph graph;
     Agents agents;
     bool disable_dist_init;
@@ -54,6 +48,6 @@ private:
     std::unordered_map<Vertex *, Agent *> occupied_now;
     std::unordered_map<Vertex *, Agent *> occupied_next;
 
-    int HeuristicDistance(const Vertex *start, const Vertex *goal);
+    int HeuristicDistance(const Vertex *start, const Vertex *goal, Direction current_direction);
     void PrintAgents();
 };
