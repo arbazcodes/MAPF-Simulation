@@ -69,7 +69,7 @@ void Sim::Init()
     std::vector<Pair> goals = endpoints[1];
 
     // Create a PIBT planner
-    pibt  *planner;
+    pibt *planner;
 
     try
     {
@@ -102,11 +102,8 @@ void Sim::Init()
                 break;
             }
         }
-        auto end_time = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> iteration_duration = end_time - start_time;
-        total_duration += iteration_duration;
 
-        std::vector<CostPath> solution;
+        std::vector<CostPath> sol;
 
         // Print results
         // std::cout << "Final positions of agents:\n";
@@ -115,13 +112,20 @@ void Sim::Init()
             // Convert agent path to robot path format
             std::vector<std::vector<int>> robotPath;
             // std::cout << "Agent " << agent->id << " - Path: ";
-            for (const auto vertex : agent->Path){
+            for (const auto vertex : agent->Path)
+            {
                 // std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
                 robotPath.push_back({vertex[0], vertex[1], vertex[2]});
             }
-            solution.push_back(robotPath);
+            sol.push_back(robotPath);
             // std::cout << std::endl;
         }
+
+        auto solution = CleanSolution(sol);
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> iteration_duration = end_time - start_time;
+        total_duration += iteration_duration;
 
         path_size = solution[0].size();
 
@@ -134,11 +138,11 @@ void Sim::Init()
             glm::vec2 goalPosition = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
             grid.SetDestinationColor(goalPosition, robotColor);
 
-            // for (const auto &step : Robots[i]->Path)
-            // {
-            //     std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
-            // }
-            // std::cout << std::endl;
+            for (const auto &step : Robots[i]->Path)
+            {
+                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
+            }
+            std::cout << std::endl;
         }
 
         std::cout << "\nDensity (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl;
@@ -148,16 +152,18 @@ void Sim::Init()
     {
         std::cerr << "Error: " << e.what() << '\n';
         Clear();
-        //Init();
+        // Init();
     }
 }
 
 void Sim::Update(float dt)
 {
-    if(AllReached() && AllRotated()){
-        if(globalPathIndex < path_size){
+    if (AllReached() && AllRotated())
+    {
+        if (globalPathIndex < path_size)
+        {
             globalPathIndex++;
-            for(auto robot : Robots)
+            for (auto robot : Robots)
             {
                 robot->isRotating = true;
                 robot->isMoving = false;
@@ -174,13 +180,15 @@ void Sim::Update(float dt)
             {
                 robot->Rotate(dt);
             }
-            else if(robot->isMoving)
+            else if (robot->isMoving)
             {
                 bool allReached = AllReached();
                 bool allRotated = AllRotated();
                 robot->Move(dt, this->UnitWidth, this->UnitHeight, allReached, allRotated);
             }
-        }else{
+        }
+        else
+        {
             robot->reachedGoal = true;
         }
     }
@@ -233,4 +241,26 @@ void Sim::Render()
     {
         robot->Draw(*Renderer);
     }
+}
+
+std::vector<std::vector<std::vector<int>>> Sim::CleanSolution(const std::vector<std::vector<std::vector<int>>> &sol)
+{
+
+    std::vector<std::vector<std::vector<int>>> solution = sol;
+
+    int max_length = solution[0].size();
+
+    for (int k = 0; k < solution.size(); k++)
+    {
+        for (int i = 0; i + 2 < max_length; i++)
+        {
+            if (solution[k][i][0] == solution[k][i + 2][0] && solution[k][i][1] == solution[k][i + 2][1])
+            {
+                solution[k][i + 1][0] = solution[k][i + 2][0];
+                solution[k][i + 1][1] = solution[k][i + 2][1];
+                solution[k][i + 1][2] = solution[k][i + 2][2];
+            }
+        }
+    }
+    return solution;
 }

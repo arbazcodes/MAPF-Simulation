@@ -28,6 +28,8 @@ public:
     void Render();
     void Clear();
 
+    std::vector<std::vector<std::vector<int>>> CleanSolution(const std::vector<std::vector<std::vector<int>>> &solution);
+
     bool AllReached();
     bool AllRotated();
     bool AllReachedGoal();
