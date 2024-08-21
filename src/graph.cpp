@@ -9,7 +9,7 @@ Graph::Graph(int w, int h)
     {
         for (int x = 0; x < width; ++x)
         {
-            locations.insert(std::make_pair(x, y)); // Use pair
+            locations.insert(Vertex(x, y)); // Use pair
         }
     }
 }
@@ -23,8 +23,8 @@ std::vector<Vertex> Graph::GetNeighbors(const Vertex &v) const
 
     for (int i = 0; i < 4; ++i)
     {
-        int nx = v.first + dx[i];
-        int ny = v.second + dy[i];
+        int nx = v.x + dx[i];
+        int ny = v.y + dy[i];
 
         if (nx >= 0 && ny >= 0 && nx < width && ny < height)
         {
