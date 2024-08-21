@@ -54,7 +54,7 @@ void Sim::Init()
     ResourceManager::LoadTexture("C:/Users/Lenovo/Desktop/Simulation - Copy/textures/block.png", false, "block");
 
     // load grid
-    grid.Load("C:/Users/Lenovo/Desktop/Simulation - Copy/levels/one.lvl", this->Width, this->Height);
+    grid.Load("C:/Users/Lenovo/Desktop/Simulation - Copy/levels/6x6.lvl", this->Width, this->Height);
     this->UnitWidth = grid.unitWidth;
     this->UnitHeight = grid.unitHeight;
 
