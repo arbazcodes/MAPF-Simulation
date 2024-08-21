@@ -1,0 +1,145 @@
+#include <vector>
+#include <queue>
+#include <map>
+#include <set>
+#include <limits>
+#include <cmath>
+
+// Manhattan Distance
+int ManhattanDistance(std::pair<int, int> a, std::pair<int, int> b)
+{
+    return std::abs(a.first - b.first) + std::abs(a.second - b.second);
+}
+
+// A* heuristic function
+int pibt::HeuristicDistance(const Vertex *start, const Vertex *goal, Direction current_direction)
+{
+    if (start == goal)
+    {
+        return 0;
+    }
+
+    // Priority queue for A* with (cost, position) where cost is the estimated cost to reach the goal
+    std::priority_queue<std::tuple<int, int, int>,
+                        std::vector<std::tuple<int, int, int>>,
+                        std::greater<std::tuple<int, int, int>>>
+        open_set;
+
+    // Map to store the shortest distance to reach each position
+    std::map<std::pair<int, int>, int> g_cost;
+    // Map to store the estimated cost (g_cost + heuristic) to reach the goal
+    std::map<std::pair<int, int>, int> f_cost;
+
+    // Initialize
+    open_set.push({0, start->x, start->y});
+    g_cost[{start->x, start->y}] = 0;
+    f_cost[{start->x, start->y}] = ManhattanDistance(std::make_pair(start->x, start->y),
+                                                     std::make_pair(goal->x, goal->y));
+
+    const std::vector<std::pair<int, int>> directions = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
+    std::set<std::pair<int, int>> occupied_cells;
+    for (const auto &agent : agents)
+    {
+        if (agent->v_next != nullptr && agent->v_next != start)
+        {
+            occupied_cells.insert({agent->v_next->x, agent->v_next->y});
+        }
+    }
+
+    while (!open_set.empty())
+    {
+        auto [current_cost, x, y] = open_set.top();
+        open_set.pop();
+
+        if (x == goal->x && y == goal->y)
+        {
+            return current_cost;
+        }
+
+        for (const auto &dir : directions)
+        {
+            int nx = x + dir.first;
+            int ny = y + dir.second;
+
+            if (nx >= 0 && ny >= 0 && nx < graph.width && ny < graph.height)
+            {
+                if (occupied_cells.find({nx, ny}) == occupied_cells.end())
+                {
+                    int new_g_cost = g_cost[{x, y}] + 1;
+                    int heuristic = ManhattanDistance(std::make_pair(nx, ny),
+                                                      std::make_pair(goal->x, goal->y));
+
+                    if (g_cost.find({nx, ny}) == g_cost.end() || new_g_cost < g_cost[{nx, ny}])
+                    {
+                        g_cost[{nx, ny}] = new_g_cost;
+                        f_cost[{nx, ny}] = new_g_cost + heuristic;
+                        open_set.push({f_cost[{nx, ny}], nx, ny});
+                    }
+                }
+            }
+        }
+    }
+
+    return std::numeric_limits<int>::max(); // Return a large value if goal is not reachable
+}
+
+
+
+
+------------------------------------------------------
+
+#include <queue>
+#include <set>
+#include <map>
+#include <limits>
+
+// BFS to compute the shortest path distance considering obstacles
+int pibt::HeuristicDistance(const Vertex *start, const Vertex *goal, Direction current_direction)
+{
+    if (start->x == goal->x && start->y == goal->y)
+        return 0;
+
+    std::queue<std::pair<int, int>> q;            // Queue of positions to explore
+    std::map<std::pair<int, int>, int> distances; // Distance map
+
+    q.push({start->x, start->y});
+    distances[{start->x, start->y}] = 0;
+
+    const std::vector<std::pair<int, int>> directions = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+
+    std::set<std::pair<int, int>> occupied_cells;
+    // for (const auto &agent : agents)
+    // {
+    //     if(agent->v_next != nullptr)
+    //         occupied_cells.insert(std::make_pair(agent->v_next->x, agent->v_next->y));
+    // }
+
+    while (!q.empty())
+    {
+        auto [x, y] = q.front();
+        q.pop();
+
+        int dist = distances[{x, y}];
+        for (const auto &dir : directions)
+        {
+            int nx = x + dir.first;
+            int ny = y + dir.second;
+
+            if (nx >= 0 && ny >= 0 && nx < graph.width && ny < graph.height)
+            {
+                if (distances.find({nx, ny}) == distances.end() && occupied_cells.find({nx, ny}) == occupied_cells.end())
+                {
+                    distances[{nx, ny}] = dist + 1;
+                    if (nx == goal->x && ny == goal->y)
+                    {
+                        return dist + 1;
+                    }
+                    q.push({nx, ny});
+                }
+            }
+        }
+    }
+
+    return std::numeric_limits<int>::max(); // Return a large value if goal is not reachable
+}

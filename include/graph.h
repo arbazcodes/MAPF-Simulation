@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <unordered_set>
+#include <set>
+#include <utility> // For std::pair
 
 enum Direction
 {
@@ -12,22 +13,16 @@ enum Direction
     None
 };
 
-struct Vertex
-{
-    int x, y;
-    Direction direction;
-    Vertex() = default;
-    Vertex(int a, int b) : x(a), y(b) {}
-};
+using Vertex = std::pair<int, int>; // Change Vertex to pair
 
 class Graph
 {
 public:
     int width, height;
-    std::unordered_set<Vertex *> locations;
+    std::set<Vertex> locations; // Change to pair
 
     Graph() = default;
     Graph(int w, int h);
-    ~Graph();
-    std::vector<Vertex *> GetNeighbors(const Vertex *v);
+    ~Graph() = default;
+    std::vector<Vertex> GetNeighbors(const Vertex &v) const;
 };

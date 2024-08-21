@@ -4,17 +4,17 @@
 #include <random>
 
 // TODO: Improve Heuristic
-int pibt::HeuristicDistance(const Vertex *start, const Vertex *goal, Direction current_direction)
+int pibt::HeuristicDistance(const Vertex &start, const Vertex &goal, Direction current_direction)
 {
     // Manhattan distance
-    int distance = std::abs(start->x - goal->x) + std::abs(start->y - goal->y);
-    int movement_cost = (start->x == goal->x && start->y == goal->y) ? 0 : 1;
+    int distance = std::abs(start.first - goal.first) + std::abs(start.second - goal.second);
+    int movement_cost = (start.first == goal.first && start.second == goal.second) ? 0 : 1;
     int direction_change_cost;
-    if ((current_direction == Direction::Up && start->direction == Direction::Down) ||
-        (current_direction == Direction::Down && start->direction == Direction::Up) ||
-        (current_direction == Direction::Left && start->direction == Direction::Right) ||
-        (current_direction == Direction::Right && start->direction == Direction::Left) ||
-        (current_direction == start->direction))
+    if ((current_direction == Direction::Up && start.second == goal.second + 1) ||
+        (current_direction == Direction::Down && start.second == goal.second - 1) ||
+        (current_direction == Direction::Left && start.first == goal.first + 1) ||
+        (current_direction == Direction::Right && start.first == goal.first - 1) ||
+        (current_direction == Direction::None))
         direction_change_cost = 0;
     else
         direction_change_cost = 1;
@@ -48,22 +48,11 @@ pibt::pibt(int w, int h,
     {
         const auto &start = starts[i];
         const auto &goal = goals[i];
-        Vertex *start_vertex = nullptr;
-        Vertex *goal_vertex = nullptr;
+        Vertex start_vertex = start;
+        Vertex goal_vertex = goal;
 
-        for (Vertex *v : graph.locations)
-        {
-            if (v->x == start.first && v->y == start.second)
-            {
-                start_vertex = v;
-            }
-            if (v->x == goal.first && v->y == goal.second)
-            {
-                goal_vertex = v;
-            }
-        }
-
-        if (!start_vertex || !goal_vertex)
+        if (graph.locations.find(start_vertex) == graph.locations.end() ||
+            graph.locations.find(goal_vertex) == graph.locations.end())
         {
             throw std::runtime_error("Invalid start or goal location.");
         }
@@ -73,7 +62,7 @@ pibt::pibt(int w, int h,
         Agent *agent = new Agent{
             static_cast<int>(i), // id
             start_vertex,        // current location
-            nullptr,             // next location
+            std::make_pair(-1, -1),        // next location (initialize with the current location)
             start_vertex,        // start
             goal_vertex,         // goal
             priorities[i],       // unique priority
@@ -81,7 +70,7 @@ pibt::pibt(int w, int h,
             Direction::None,     // initialize current direction
             {}                   // initialize path
         };
-        agent->Path.push_back({start_vertex->x, start_vertex->y, Direction::None});
+        agent->Path.push_back({start_vertex.first, start_vertex.second, Direction::None});
         agents.push_back(agent);
     }
 }
@@ -94,11 +83,11 @@ pibt::~pibt()
     }
 }
 
-Agent *pibt::FindConflictingAgent(const Vertex *v, const Agent *agent)
+Agent *pibt::FindConflictingAgent(const Vertex &v, const Agent *agent)
 {
     for (auto ak : agents)
     {
-        if (ak->v_now == v && ak->v_next == nullptr && ak->id != agent->id)
+        if (ak->v_now == v && ak->v_next == std::make_pair(-1, -1) && ak->id != agent->id)
         {
             return ak;
         }
@@ -121,17 +110,17 @@ void pibt::PrintAgents()
     for (auto agent : agents)
     {
         std::cout << "Agent ID: " << agent->id << '\n';
-        std::cout << "Current Location: (" << agent->v_now->x << ", " << agent->v_now->y << ")\n";
+        std::cout << "Current Location: (" << agent->v_now.first << ", " << agent->v_now.second << ")\n";
         std::cout << "Next Location: ";
-        if (agent->v_next)
+        if (agent->v_next != std::make_pair(-1, -1))
         {
-            std::cout << "(" << agent->v_next->x << ", " << agent->v_next->y << ")\n";
+            std::cout << "(" << agent->v_next.first << ", " << agent->v_next.second << ")\n";
         }
         else
         {
             std::cout << "None\n";
         }
-        std::cout << "Goal Location: (" << agent->goal->x << ", " << agent->goal->y << ")\n";
+        std::cout << "Goal Location: (" << agent->goal.first << ", " << agent->goal.second << ")\n";
         std::cout << "Priority: " << agent->priority << '\n';
         std::cout << "Reached Goal: " << (agent->reached_goal ? "Yes" : "No") << '\n';
     }
@@ -146,17 +135,16 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         ai->priority = std::max(ai->priority, aj->priority);
     }
 
-    auto compare = [&](Vertex *const v, Vertex *const u)
+    auto compare = [&](const Vertex &v, const Vertex &u)
     {
         int d_v = HeuristicDistance(v, ai->goal, ai->current_direction);
         int d_u = HeuristicDistance(u, ai->goal, ai->current_direction);
-        if(d_v != d_u)
+        if (d_v != d_u)
             return d_v < d_u;
         return false;
     };
 
-    std::vector<Vertex *> candidates = graph.GetNeighbors(ai->v_now);
-    ai->v_now->direction = Direction::None;
+    std::vector<Vertex> candidates = graph.GetNeighbors(ai->v_now);
     candidates.push_back(ai->v_now);
     std::sort(candidates.begin(), candidates.end(), compare);
 
@@ -164,7 +152,7 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
 
     bool tried_backtracking = false;
 
-    for (Vertex *u : candidates)
+    for (const Vertex &u : candidates)
     {
         bool vertex_conflict = false;
         for (auto ak : agents)
@@ -189,7 +177,7 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
         bool follow_conflict = false;
         for (auto ak : agents)
         {
-            if (ak->id != ai->id && ak->v_next != nullptr && ak->v_now == u)
+            if (ak->id != ai->id && ak->v_next != std::make_pair(-1, -1) && ak->v_now == u)
             {
                 follow_conflict = true;
                 break;
@@ -236,7 +224,7 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
             }
             else
             {
-                ai->v_next = nullptr;
+                ai->v_next = std::make_pair(-1, -1);
                 continue;
             }
         }
@@ -262,21 +250,21 @@ void pibt::run()
     {
         for (auto *agent : agents)
         {
-            if (!(agent->v_now == agent->goal))
+            if (agent->v_now != agent->goal)
                 agent->priority++;
             else
                 agent->reached_goal = true;
 
-            if (agent->v_next != nullptr)
+            if (agent->v_next != std::make_pair(-1, -1))
             {
                 Direction new_direction = Direction::None;
-                if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y - 1)
+                if (agent->v_next.first == agent->v_now.first && agent->v_next.second == agent->v_now.second - 1)
                     new_direction = Direction::Up;
-                else if (agent->v_next->x == agent->v_now->x && agent->v_next->y == agent->v_now->y + 1)
+                else if (agent->v_next.first == agent->v_now.first && agent->v_next.second == agent->v_now.second + 1)
                     new_direction = Direction::Down;
-                else if (agent->v_next->x == agent->v_now->x - 1 && agent->v_next->y == agent->v_now->y)
+                else if (agent->v_next.first == agent->v_now.first - 1 && agent->v_next.second == agent->v_now.second)
                     new_direction = Direction::Left;
-                else if (agent->v_next->x == agent->v_now->x + 1 && agent->v_next->y == agent->v_now->y)
+                else if (agent->v_next.first == agent->v_now.first + 1 && agent->v_next.second == agent->v_now.second)
                     new_direction = Direction::Right;
 
                 // Maintain direction consistency for opposite moves
@@ -289,10 +277,10 @@ void pibt::run()
                     new_direction = agent->current_direction;
                 }
 
-                agent->Path.push_back({agent->v_next->x, agent->v_next->y, new_direction});
+                agent->Path.push_back({agent->v_next.first, agent->v_next.second, new_direction});
                 agent->current_direction = new_direction; // Update previous direction
                 agent->v_now = agent->v_next;
-                agent->v_next = nullptr;
+                agent->v_next = std::make_pair(-1, -1); // Set to invalid
             }
         }
 
@@ -300,7 +288,7 @@ void pibt::run()
 
         for (auto *agent : agents)
         {
-            if (agent->v_next == nullptr)
+            if (agent->v_next == std::make_pair(-1, -1))
             {
                 PIBT(agent, nullptr);
             }
