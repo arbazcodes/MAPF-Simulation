@@ -18,8 +18,10 @@ std::vector<Vertex> Graph::GetNeighbors(const Vertex &v) const
 {
     std::vector<Vertex> neighbors;
 
-    int dx[] = {0, 0, -1, 1};
-    int dy[] = {-1, 1, 0, 0};
+    int dx[] = {0, 0, -1, 1, 0};
+    int dy[] = {-1, 1, 0, 0, 0};
+
+    std::vector<Direction> direction_vector = {Direction::Up, Direction::Down, Direction::Left, Direction::Right, Direction::None};
 
     for (int i = 0; i < 4; ++i)
     {
@@ -31,6 +33,7 @@ std::vector<Vertex> Graph::GetNeighbors(const Vertex &v) const
             Vertex neighbor = {nx, ny};
             if (locations.find(neighbor) != locations.end())
             {
+                neighbor.direction = direction_vector[i];
                 neighbors.push_back(neighbor);
             }
         }

@@ -67,7 +67,7 @@ pibt::pibt(int w, int h,
             goal_vertex,         // goal
             priorities[i],       // unique priority
             false,               // reached goal
-            Direction::None,     // initialize current direction
+            Direction::Up,     // initialize current direction
             {}                   // initialize path
         };
         agent->Path.push_back({start_vertex.x, start_vertex.y, Direction::None});
@@ -143,7 +143,6 @@ bool pibt::PIBT(Agent *ai, Agent *aj)
     };
 
     std::vector<Vertex> candidates = graph.GetNeighbors(ai->v_now);
-    candidates.push_back(ai->v_now);
     std::sort(candidates.begin(), candidates.end(), compare);
 
     bool found_valid_move = false;
@@ -255,16 +254,7 @@ void pibt::run()
 
             if (agent->v_next.x != -1 && agent->v_next.y != -1)
             {
-                Direction new_direction = Direction::None;
-                if (agent->v_next.x == agent->v_now.x && agent->v_next.y == agent->v_now.y - 1)
-                    new_direction = Direction::Up;
-                else if (agent->v_next.x == agent->v_now.x && agent->v_next.y == agent->v_now.y + 1)
-                    new_direction = Direction::Down;
-                else if (agent->v_next.x == agent->v_now.x - 1 && agent->v_next.y == agent->v_now.y)
-                    new_direction = Direction::Left;
-                else if (agent->v_next.x == agent->v_now.x + 1 && agent->v_next.y == agent->v_now.y)
-                    new_direction = Direction::Right;
-
+                Direction new_direction = agent->v_next.direction;
                 // Maintain direction consistency for opposite moves
                 if ((new_direction == Direction::Up && agent->current_direction == Direction::Down) ||
                     (new_direction == Direction::Down && agent->current_direction == Direction::Up) ||
