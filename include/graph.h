@@ -38,6 +38,8 @@ public:
 
     Graph() = default;
     Graph(int w, int h);
-    ~Graph() = default;
+    ~Graph();
+    void Init();
+    void Clear();
     std::vector<Vertex> GetNeighbors(const Vertex &v) const;
 };

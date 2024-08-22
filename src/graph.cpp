@@ -2,9 +2,11 @@
 #include <iostream>
 #include <stdexcept>
 
-Graph::Graph(int w, int h)
-    : width(w), height(h)
-{
+Graph::Graph(int w, int h): width(w), height(h){
+    Init();
+}
+
+void Graph::Init(){
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
@@ -12,6 +14,14 @@ Graph::Graph(int w, int h)
             locations.insert(Vertex(x, y)); // Use pair
         }
     }
+}
+
+void Graph::Clear(){
+    locations.clear();
+}
+
+Graph::~Graph(){
+    Clear();
 }
 
 std::vector<Vertex> Graph::GetNeighbors(const Vertex &v) const

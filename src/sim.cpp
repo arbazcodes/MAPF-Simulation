@@ -21,18 +21,19 @@ Sim::Sim(unsigned int width, unsigned int height)
 
 Sim::~Sim()
 {
+    Clear();
+}
+
+void Sim::Clear()
+{
+    ResourceManager::Clear();
     delete Renderer;
     for (auto robot : Robots)
     {
         delete robot;
     }
     Robots.clear();
-}
-
-void Sim::Clear()
-{
-    ResourceManager::Clear();
-    Robots.clear();
+    globalPathIndex = 1;
 }
 
 void Sim::Init()
@@ -77,10 +78,10 @@ void Sim::Init()
         int failure_count = 0;
         std::chrono::duration<double> total_duration(0);
         std::chrono::_V2::system_clock::time_point start_time;
+        start_time = std::chrono::high_resolution_clock::now();
 
         while (recursive_run < 10)
         {
-            start_time = std::chrono::high_resolution_clock::now();
             // Create a new planner instance
             planner = new pibt(COLS, ROWS, starts, goals);
             // Run the PIBT algorithm with a timeout
@@ -121,6 +122,9 @@ void Sim::Init()
             // std::cout << std::endl;
         }
 
+        planner->Clear();
+        delete planner;
+
         auto solution = CleanSolution(sol);
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -133,7 +137,7 @@ void Sim::Init()
         {
             glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
-            Robots.push_back(new Robot(InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
+            Robots.push_back(new Robot(i, InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
             Robots[i]->Path = solution[i];
             glm::vec2 goalPosition = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
             grid.SetDestinationColor(goalPosition, robotColor);
@@ -152,7 +156,7 @@ void Sim::Init()
     {
         std::cerr << "Error: " << e.what() << '\n';
         Clear();
-        // Init();
+        Init();
     }
 }
 
@@ -191,13 +195,14 @@ void Sim::Update(float dt)
         {
             robot->reachedGoal = true;
         }
+        robot->UpdateStatus();
     }
-    // if(AllReachedGoal())
-    // {
-    //     sleep(5);
-    //     Clear();
-    //     //Init();
-    // }
+    if(AllReachedGoal())
+    {
+        sleep(0.5);
+        Clear();
+        Init();
+    }
 }
 
 bool Sim::AllReached()
@@ -225,7 +230,7 @@ bool Sim::AllReachedGoal()
 {
     for (auto robot : Robots)
     {
-        if (!robot->reachedGoal)
+        if (robot->status == DELIVERING)
             return false;
     }
 

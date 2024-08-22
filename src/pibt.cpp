@@ -25,9 +25,13 @@ int pibt::HeuristicDistance(const Vertex &start, const Vertex &goal, Direction c
 pibt::pibt(int w, int h,
            const std::vector<std::pair<int, int>> &starts,
            const std::vector<std::pair<int, int>> &goals)
-    : graph(w, h),
-      agents(),
-      disable_dist_init(false)
+    : graph(w, h)
+{
+    Init(starts, goals);
+}
+
+void pibt::Init(const std::vector<std::pair<int, int>> &starts,
+                const std::vector<std::pair<int, int>> &goals)
 {
     // Create a list of unique priorities
     const size_t num_agents = starts.size();
@@ -62,12 +66,12 @@ pibt::pibt(int w, int h,
         Agent *agent = new Agent{
             static_cast<int>(i), // id
             start_vertex,        // current location
-            {-1, -1},        // next location (initialize with the current location)
+            {-1, -1},            // next location (initialize with the current location)
             start_vertex,        // start
             goal_vertex,         // goal
             priorities[i],       // unique priority
             false,               // reached goal
-            Direction::Up,     // initialize current direction
+            Direction::Up,       // initialize current direction
             {}                   // initialize path
         };
         agent->Path.push_back({start_vertex.x, start_vertex.y, Direction::None});
@@ -75,12 +79,18 @@ pibt::pibt(int w, int h,
     }
 }
 
-pibt::~pibt()
-{
+void pibt::Clear(){
     for (Agent *agent : agents)
     {
         delete agent;
     }
+    agents.clear();
+    graph.Clear();
+}
+
+pibt::~pibt()
+{
+    Clear();
 }
 
 Agent *pibt::FindConflictingAgent(const Vertex &v, const Agent *agent)

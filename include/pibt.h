@@ -27,15 +27,16 @@ public:
 
     Graph graph;
     Agents agents;
-    bool disable_dist_init;
 
     pibt(int w, int h,
          const std::vector<std::pair<int, int>> &starts,
          const std::vector<std::pair<int, int>> &goals);
     ~pibt();
 
+    void Init(const std::vector<std::pair<int, int>> &starts,
+              const std::vector<std::pair<int, int>> &goals);
+    void Clear();
     void run();
-
     bool PIBT(Agent *ai, Agent *aj = nullptr);
     Agent *FindConflictingAgent(const Vertex &v, const Agent *agent);
     bool allReached();
