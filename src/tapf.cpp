@@ -1,19 +1,19 @@
 #include "tapf.h"
 
 // Function to generate unique random positions within grid bounds
-std::vector<Pair> GenerateUniqueRandomPositions(int num_positions, int grid_rows, int grid_cols, std::mt19937 &rng)
+std::vector<std::vector<int>> GenerateUniqueRandomPositions(int num_positions, int grid_rows, int grid_cols, std::mt19937 &rng)
 {
     if (num_positions > grid_rows * grid_cols)
     {
         throw std::invalid_argument("Number of positions requested exceeds the number of available grid cells.");
     }
 
-    std::vector<Pair> all_positions;
+    std::vector<std::vector<int>> all_positions;
     for (int row = 0; row < grid_rows; ++row)
     {
         for (int col = 0; col < grid_cols; ++col)
         {
-            all_positions.emplace_back(row, col);
+            all_positions.push_back({row, col, 0});
         }
     }
 
@@ -23,10 +23,10 @@ std::vector<Pair> GenerateUniqueRandomPositions(int num_positions, int grid_rows
 }
 
 // Function to ensure unique start and goal positions
-void EnsureUniqueStartAndGoal(std::vector<Pair> &starts, std::vector<Pair> &goals, std::mt19937 &rng, int grid_rows, int grid_cols)
+void EnsureUniqueStartAndGoal(std::vector<std::vector<int>> &starts, std::vector<std::vector<int>> &goals, std::mt19937 &rng, int grid_rows, int grid_cols)
 {
-    std::set<Pair> start_set;
-    std::set<Pair> goal_set;
+    std::set<std::vector<int>> start_set;
+    std::set<std::vector<int>> goal_set;
 
     // Generate unique starts
     while (start_set.size() < starts.size())
@@ -45,7 +45,7 @@ void EnsureUniqueStartAndGoal(std::vector<Pair> &starts, std::vector<Pair> &goal
     goals.assign(goal_set.begin(), goal_set.end());
 
     // Ensure no start position is the same as any goal position
-    std::set<Pair> all_positions = start_set;
+    std::set<std::vector<int>> all_positions = start_set;
     all_positions.insert(goal_set.begin(), goal_set.end());
 
     // Regenerate goals if there are overlaps with start positions
@@ -64,7 +64,7 @@ void EnsureUniqueStartAndGoal(std::vector<Pair> &starts, std::vector<Pair> &goal
     goals.assign(goal_set.begin(), goal_set.end());
 }
 
-std::vector<std::vector<Pair>> GenerateEndpoints(int num_agents, int grid_rows, int grid_cols)
+std::vector<std::vector<std::vector<int>>> GenerateEndpoints(int num_agents, int grid_rows, int grid_cols)
 {
     // Initialize the grid
     std::vector<std::vector<int>> grid(grid_rows, std::vector<int>(grid_cols, 1));

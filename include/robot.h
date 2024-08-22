@@ -1,5 +1,5 @@
-#ifndef BALL_OBJECT_H
-#define BALL_OBJECT_H
+#ifndef ROBOT_H
+#define ROBOT_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>

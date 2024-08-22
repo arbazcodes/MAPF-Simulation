@@ -35,6 +35,8 @@ void Sim::Clear()
     Robots.clear();
     globalPathIndex = 1;
     idle_robots.clear();
+    starts.clear();
+    goals.clear();
 }
 
 void Sim::Init()
@@ -67,8 +69,8 @@ void Sim::Init()
 
     auto endpoints = GenerateEndpoints(NUMBER_OF_ROBOTS, ROWS, COLS);
 
-    std::vector<Pair> starts = endpoints[0];
-    std::vector<Pair> goals = endpoints[1];
+    starts = endpoints[0];
+    goals = endpoints[1];
 
     // Create a PIBT planner
     pibt *planner;
@@ -101,6 +103,7 @@ void Sim::Init()
             }
             else
             {
+                planner->SortAgentsById();
                 break;
             }
         }
@@ -226,8 +229,19 @@ void Sim::Replan()
     // std::vector<std::vector<int>> current_positions;
     // for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
     // {
-    //     current_positions.push_back({Robots[i]->Path[globalPathIndex]});
+    //     newStarts.push_back(({Robots[i]->Path[globalPathIndex]});
     // }
+    
+    // for(auto id : idle_robots){
+
+    //     std::vector<std::vector<Pair>> endpoits = GenerateEndpoints(1, ROWS, COLS);
+    //     bool duplicate = true;
+
+    //     while()
+    // }
+
+
+
 
     sleep(1);
     Clear();

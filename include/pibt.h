@@ -29,17 +29,18 @@ public:
     Agents agents;
 
     pibt(int w, int h,
-         const std::vector<std::pair<int, int>> &starts,
-         const std::vector<std::pair<int, int>> &goals);
+         const std::vector<std::vector<int>> &starts,
+         const std::vector<std::vector<int>> &goals);
     ~pibt();
 
-    void Init(const std::vector<std::pair<int, int>> &starts,
-              const std::vector<std::pair<int, int>> &goals);
+    void Init(const std::vector<std::vector<int>> &starts,
+              const std::vector<std::vector<int>> &goals);
     void Clear();
     void run();
     bool PIBT(Agent *ai, Agent *aj = nullptr);
     Agent *FindConflictingAgent(const Vertex &v, const Agent *agent);
     bool allReached();
+    void SortAgentsById();
 
 private:
     int HeuristicDistance(const Vertex &start, const Vertex &goal, Direction current_direction);

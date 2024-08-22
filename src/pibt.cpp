@@ -23,15 +23,15 @@ int pibt::HeuristicDistance(const Vertex &start, const Vertex &goal, Direction c
 }
 
 pibt::pibt(int w, int h,
-           const std::vector<std::pair<int, int>> &starts,
-           const std::vector<std::pair<int, int>> &goals)
+           const std::vector<std::vector<int>> &starts,
+           const std::vector<std::vector<int>> &goals)
     : graph(w, h)
 {
     Init(starts, goals);
 }
 
-void pibt::Init(const std::vector<std::pair<int, int>> &starts,
-                const std::vector<std::pair<int, int>> &goals)
+void pibt::Init(const std::vector<std::vector<int>> &starts,
+                const std::vector<std::vector<int>> &goals)
 {
     // Create a list of unique priorities
     const size_t num_agents = starts.size();
@@ -52,8 +52,8 @@ void pibt::Init(const std::vector<std::pair<int, int>> &starts,
     {
         const auto &start = starts[i];
         const auto &goal = goals[i];
-        Vertex start_vertex = {start.first, start.second};
-        Vertex goal_vertex = {goal.first, goal.second};
+        Vertex start_vertex = {start[0], start[1]};
+        Vertex goal_vertex = {goal[0], goal[1]};
 
         if (graph.locations.find(start_vertex) == graph.locations.end() ||
             graph.locations.find(goal_vertex) == graph.locations.end())
@@ -64,15 +64,15 @@ void pibt::Init(const std::vector<std::pair<int, int>> &starts,
         // int init_dist = disable_dist_init ? 0 : HeuristicDistance(start_vertex, goal_vertex);
 
         Agent *agent = new Agent{
-            static_cast<int>(i), // id
-            start_vertex,        // current location
-            {-1, -1},            // next location (initialize with the current location)
-            start_vertex,        // start
-            goal_vertex,         // goal
-            priorities[i],       // unique priority
-            false,               // reached goal
-            Direction::Up,       // initialize current direction
-            {}                   // initialize path
+            static_cast<int>(i),        // id
+            start_vertex,               // current location
+            {-1, -1},                   // next location (initialize with the current location)
+            start_vertex,               // start
+            goal_vertex,                // goal
+            priorities[i],              // unique priority
+            false,                      // reached goal
+            (Direction) start[2],       // initialize current direction
+            {}                          // initialize path
         };
         agent->Path.push_back({start_vertex.x, start_vertex.y, Direction::None});
         agents.push_back(agent);
@@ -134,6 +134,12 @@ void pibt::PrintAgents()
         std::cout << "Priority: " << agent->priority << '\n';
         std::cout << "Reached Goal: " << (agent->reached_goal ? "Yes" : "No") << '\n';
     }
+}
+
+void pibt::SortAgentsById()
+{
+    std::sort(agents.begin(), agents.end(), [](const Agent *a, const Agent *b)
+              { return a->id < b->id; });
 }
 
 // Function to determine next move for an agent

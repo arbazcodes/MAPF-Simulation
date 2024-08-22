@@ -22,6 +22,8 @@ public:
     Grid grid;
     int globalPathIndex = 1;
     int path_size;
+    std::vector<std::vector<int>> starts;
+    std::vector<std::vector<int>> goals;
 
     Sim(unsigned int width, unsigned int height);
     ~Sim();
