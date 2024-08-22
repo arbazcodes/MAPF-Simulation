@@ -2,16 +2,16 @@
 
 // Constructor with default values
 Robot::Robot()
-    : id(), InitialPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(300.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
+    : id(), InitialPosition(0.0f, 0.0f), GoalPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(300.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
-    reached = false, rotated = false, reachedGoal = false;
+    reached = false, rotated = false;
 }
 
 // Constructor with specified values
-Robot::Robot(int i, glm::vec2 pos, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
-    : id(i), InitialPosition(pos), CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(color)
+Robot::Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
+    : id(i), InitialPosition(pos), GoalPosition(goal),CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(color)
 {
-    reached = false, rotated = false, reachedGoal = false;
+    reached = false, rotated = false;
 }
 
 void Robot::Rotate(float dt)
@@ -155,11 +155,14 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     this->CurrentPosition += movement;
 }
 
+bool Robot::ReachedGoal(){
+    bool reachedGoal = (glm::distance(CurrentPosition, GoalPosition) < 10.0f);
+    return reachedGoal;
+}
+
 void Robot::UpdateStatus(){
-    if(this->Path.empty())
+    if(this->Path.empty() || ReachedGoal())
         this->status = IDLE;
-    else if(reachedGoal)
-        this->status = DELIVERED;
     else
         this->status = DELIVERING;
 }

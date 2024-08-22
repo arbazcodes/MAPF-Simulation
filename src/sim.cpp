@@ -34,6 +34,7 @@ void Sim::Clear()
     }
     Robots.clear();
     globalPathIndex = 1;
+    idle_robots.clear();
 }
 
 void Sim::Init()
@@ -132,15 +133,16 @@ void Sim::Init()
         total_duration += iteration_duration;
 
         path_size = solution[0].size();
-
+        idle_robots = {};
         for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
         {
             glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
+            glm::vec2 GoalPosition = glm::vec2(((float)solution[i].back()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].back()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
-            Robots.push_back(new Robot(i, InitialPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
+            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
             Robots[i]->Path = solution[i];
-            glm::vec2 goalPosition = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
-            grid.SetDestinationColor(goalPosition, robotColor);
+            glm::vec2 destination = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
+            grid.SetDestinationColor(destination, robotColor);
 
             for (const auto &step : Robots[i]->Path)
             {
@@ -162,47 +164,74 @@ void Sim::Init()
 
 void Sim::Update(float dt)
 {
-    if (AllReached() && AllRotated())
+    if (StateChanged())
     {
-        if (globalPathIndex < path_size)
+        Replan();
+    }
+    else
+    {
+        if (AllReached() && AllRotated())
         {
-            globalPathIndex++;
-            for (auto robot : Robots)
+            if (globalPathIndex < path_size)
             {
-                robot->isRotating = true;
-                robot->isMoving = false;
-                robot->reached = false;
+                globalPathIndex++;
+                for (auto robot : Robots)
+                {
+                    robot->isRotating = true;
+                    robot->isMoving = false;
+                    robot->reached = false;
+                }
             }
         }
+        for (auto robot : Robots)
+        {
+            if (globalPathIndex < robot->Path.size())
+            {
+                robot->currentPathIndex = globalPathIndex;
+                if (robot->isRotating)
+                {
+                    robot->Rotate(dt);
+                }
+                else if (robot->isMoving)
+                {
+                    bool allReached = AllReached();
+                    bool allRotated = AllRotated();
+                    robot->Move(dt, this->UnitWidth, this->UnitHeight, allReached, allRotated);
+                }
+            }
+            robot->UpdateStatus();
+        }
     }
+}
+
+bool Sim::StateChanged()
+{
     for (auto robot : Robots)
     {
-        if (globalPathIndex < robot->Path.size())
-        {
-            robot->currentPathIndex = globalPathIndex;
-            if (robot->isRotating)
-            {
-                robot->Rotate(dt);
-            }
-            else if (robot->isMoving)
-            {
-                bool allReached = AllReached();
-                bool allRotated = AllRotated();
-                robot->Move(dt, this->UnitWidth, this->UnitHeight, allReached, allRotated);
-            }
-        }
+        if (robot->status == Status::IDLE)
+            idle_robots.insert(robot->id);
         else
-        {
-            robot->reachedGoal = true;
-        }
-        robot->UpdateStatus();
+            idle_robots.erase(robot->id);
     }
-    if(AllReachedGoal())
-    {
-        sleep(0.5);
-        Clear();
-        Init();
-    }
+    if (idle_robots.size() == NUMBER_OF_ROBOTS)
+        return true;
+    return false;
+}
+
+void Sim::Replan()
+{
+    // std::vector<Pair> newStarts;
+    // std::vector<Pair> newGoals;
+
+    // std::vector<std::vector<int>> current_positions;
+    // for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
+    // {
+    //     current_positions.push_back({Robots[i]->Path[globalPathIndex]});
+    // }
+
+    sleep(1);
+    Clear();
+    Init();
 }
 
 bool Sim::AllReached()
@@ -212,7 +241,6 @@ bool Sim::AllReached()
         if (!robot->reached)
             return false;
     }
-
     return true;
 }
 bool Sim::AllRotated()

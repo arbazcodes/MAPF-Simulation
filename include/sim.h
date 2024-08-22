@@ -3,11 +3,12 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <set>
 #include "grid.h"
 #include "robot.h"
 #include "pibt.h"
 
-const glm::vec2 INITIAL_VELOCITY(300.0f, 300.0f);
+const glm::vec2 INITIAL_VELOCITY(100.0f, 100.0f);
 const float RADIUS = 30.0f;
 #define ROWS 6
 #define COLS 6
@@ -29,6 +30,9 @@ public:
     void Render();
     void Clear();
 
+    bool StateChanged();
+    void Replan();
+
     std::vector<std::vector<std::vector<int>>> CleanSolution(const std::vector<std::vector<std::vector<int>>> &solution);
 
     bool AllReached();
@@ -37,6 +41,7 @@ public:
 
 private:
     std::vector<Robot *> Robots;
+    std::set<int> idle_robots;
 };
 
 #endif
