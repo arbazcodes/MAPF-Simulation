@@ -56,7 +56,7 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\Lenovo\Desktop\Breakout\include\glm
+CMAKE_SOURCE_DIR = "C:\Users\Lenovo\Desktop\Simulation - Copy"
 
 # The top-level build directory on which CMake was run.
 CMAKE_BINARY_DIR = "C:\Users\Lenovo\Desktop\Simulation - Copy\build"
@@ -83,6 +83,51 @@ rebuild_cache:
 # Special rule for the target rebuild_cache
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	"C:\Program Files\CMake\bin\cmake.exe" -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Install the project..."
+	"C:\Program Files\CMake\bin\cmake.exe" -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing only the local directory..."
+	"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Installing the project stripped..."
+	"C:\Program Files\CMake\bin\cmake.exe" -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -116,47 +161,134 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named glm_dummy
+# Target rules for targets named graph
 
 # Build rule for target.
-glm_dummy: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 glm_dummy
-.PHONY : glm_dummy
+graph: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 graph
+.PHONY : graph
 
 # fast build rule for target.
-glm_dummy/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/build
-.PHONY : glm_dummy/fast
+graph/fast:
+	$(MAKE) $(MAKESILENT) -f libs\graph\CMakeFiles\graph.dir\build.make libs/graph/CMakeFiles/graph.dir/build
+.PHONY : graph/fast
 
-# target to build an object file
-detail/dummy.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/dummy.obj
-.PHONY : detail/dummy.obj
+#=============================================================================
+# Target rules for targets named pibt
 
-# target to preprocess a source file
-detail/dummy.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/dummy.i
-.PHONY : detail/dummy.i
+# Build rule for target.
+pibt: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 pibt
+.PHONY : pibt
 
-# target to generate assembly for a file
-detail/dummy.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/dummy.s
-.PHONY : detail/dummy.s
+# fast build rule for target.
+pibt/fast:
+	$(MAKE) $(MAKESILENT) -f libs\pibt\CMakeFiles\pibt.dir\build.make libs/pibt/CMakeFiles/pibt.dir/build
+.PHONY : pibt/fast
 
-# target to build an object file
-detail/glm.obj:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/glm.obj
-.PHONY : detail/glm.obj
+#=============================================================================
+# Target rules for targets named tapf_lib
 
-# target to preprocess a source file
-detail/glm.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/glm.i
-.PHONY : detail/glm.i
+# Build rule for target.
+tapf_lib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 tapf_lib
+.PHONY : tapf_lib
 
-# target to generate assembly for a file
-detail/glm.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles\glm_dummy.dir\build.make CMakeFiles/glm_dummy.dir/detail/glm.s
-.PHONY : detail/glm.s
+# fast build rule for target.
+tapf_lib/fast:
+	$(MAKE) $(MAKESILENT) -f libs\tapf\CMakeFiles\tapf_lib.dir\build.make libs/tapf/CMakeFiles/tapf_lib.dir/build
+.PHONY : tapf_lib/fast
+
+#=============================================================================
+# Target rules for targets named visual_lib
+
+# Build rule for target.
+visual_lib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 visual_lib
+.PHONY : visual_lib
+
+# fast build rule for target.
+visual_lib/fast:
+	$(MAKE) $(MAKESILENT) -f libs\visual_lib\CMakeFiles\visual_lib.dir\build.make libs/visual_lib/CMakeFiles/visual_lib.dir/build
+.PHONY : visual_lib/fast
+
+#=============================================================================
+# Target rules for targets named glad
+
+# Build rule for target.
+glad: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 glad
+.PHONY : glad
+
+# fast build rule for target.
+glad/fast:
+	$(MAKE) $(MAKESILENT) -f libs\external_lib\glad\CMakeFiles\glad.dir\build.make libs/external_lib/glad/CMakeFiles/glad.dir/build
+.PHONY : glad/fast
+
+#=============================================================================
+# Target rules for targets named uninstall
+
+# Build rule for target.
+uninstall: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 uninstall
+.PHONY : uninstall
+
+# fast build rule for target.
+uninstall/fast:
+	$(MAKE) $(MAKESILENT) -f libs\external_lib\glfw-3.4\CMakeFiles\uninstall.dir\build.make libs/external_lib/glfw-3.4/CMakeFiles/uninstall.dir/build
+.PHONY : uninstall/fast
+
+#=============================================================================
+# Target rules for targets named glfw
+
+# Build rule for target.
+glfw: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 glfw
+.PHONY : glfw
+
+# fast build rule for target.
+glfw/fast:
+	$(MAKE) $(MAKESILENT) -f libs\external_lib\glfw-3.4\src\CMakeFiles\glfw.dir\build.make libs/external_lib/glfw-3.4/src/CMakeFiles/glfw.dir/build
+.PHONY : glfw/fast
+
+#=============================================================================
+# Target rules for targets named update_mappings
+
+# Build rule for target.
+update_mappings: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 update_mappings
+.PHONY : update_mappings
+
+# fast build rule for target.
+update_mappings/fast:
+	$(MAKE) $(MAKESILENT) -f libs\external_lib\glfw-3.4\src\CMakeFiles\update_mappings.dir\build.make libs/external_lib/glfw-3.4/src/CMakeFiles/update_mappings.dir/build
+.PHONY : update_mappings/fast
+
+#=============================================================================
+# Target rules for targets named glm
+
+# Build rule for target.
+glm: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 glm
+.PHONY : glm
+
+# fast build rule for target.
+glm/fast:
+	$(MAKE) $(MAKESILENT) -f libs\external_lib\glm\glm\CMakeFiles\glm.dir\build.make libs/external_lib/glm/glm/CMakeFiles/glm.dir/build
+.PHONY : glm/fast
+
+#=============================================================================
+# Target rules for targets named simulation_engine
+
+# Build rule for target.
+simulation_engine: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 simulation_engine
+.PHONY : simulation_engine
+
+# fast build rule for target.
+simulation_engine/fast:
+	$(MAKE) $(MAKESILENT) -f apps\CMakeFiles\simulation_engine.dir\build.make apps/CMakeFiles/simulation_engine.dir/build
+.PHONY : simulation_engine/fast
 
 # Help Target
 help:
@@ -165,14 +297,21 @@ help:
 	@echo ... clean
 	@echo ... depend
 	@echo ... edit_cache
+	@echo ... install
+	@echo ... install/local
+	@echo ... install/strip
+	@echo ... list_install_components
 	@echo ... rebuild_cache
-	@echo ... glm_dummy
-	@echo ... detail/dummy.obj
-	@echo ... detail/dummy.i
-	@echo ... detail/dummy.s
-	@echo ... detail/glm.obj
-	@echo ... detail/glm.i
-	@echo ... detail/glm.s
+	@echo ... uninstall
+	@echo ... update_mappings
+	@echo ... glad
+	@echo ... glfw
+	@echo ... glm
+	@echo ... graph
+	@echo ... pibt
+	@echo ... simulation_engine
+	@echo ... tapf_lib
+	@echo ... visual_lib
 .PHONY : help
 
 

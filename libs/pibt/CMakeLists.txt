@@ -1,0 +1,5 @@
+file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+add_library(pibt ${HEADERS} ${SOURCES})
+target_include_directories(pibt PUBLIC include)
+target_link_libraries(pibt PRIVATE graph)
