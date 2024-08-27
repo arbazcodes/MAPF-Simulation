@@ -1,3 +1,0 @@
-ccache "C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\simulation_engine.dir/objects.a
-ccache C:\MinGW\bin\ar.exe qc CMakeFiles\simulation_engine.dir/objects.a @CMakeFiles\simulation_engine.dir\objects1.rsp
-ccache C:\MinGW\bin\g++.exe -O3 -DNDEBUG -Wl,--whole-archive CMakeFiles\simulation_engine.dir/objects.a -Wl,--no-whole-archive -o simulation_engine.exe -Wl,--out-implib,libsimulation_engine.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\simulation_engine.dir\linkLibs.rsp
