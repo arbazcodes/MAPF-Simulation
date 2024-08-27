@@ -30,7 +30,7 @@ public:
     int currentPathIndex;
 
     Robot();
-    Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color);
+    Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion);
 
     void UpdateStatus();
     bool ReachedGoal();

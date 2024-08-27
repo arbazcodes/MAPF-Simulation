@@ -8,8 +8,8 @@ Robot::Robot()
 }
 
 // Constructor with specified values
-Robot::Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color)
-    : id(i), InitialPosition(pos), GoalPosition(goal),CurrentPosition(pos), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(500.0f), Color(color)
+Robot::Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion)
+    : id(i), InitialPosition(pos), GoalPosition(goal), CurrentPosition(current_postion), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(current_rotation), AngularVelocity(500.0f), Color(color)
 {
     reached = false, rotated = false;
 }
@@ -85,15 +85,18 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     if (!this->isMoving)
         return;
 
-    if(!AllRobotsRotated)
+    if (!AllRobotsRotated)
         return;
 
     int x, y;
 
-    if(!reached){
+    if (!reached)
+    {
         x = this->Path[currentPathIndex][0] - this->Path[currentPathIndex - 1][0];
         y = this->Path[currentPathIndex][1] - this->Path[currentPathIndex - 1][1];
-    }else{
+    }
+    else
+    {
         x = 0;
         y = 0;
     }
@@ -107,8 +110,8 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     {
         this->isRotating = true;
         this->isMoving = false;
-        this->InitialPosition = CurrentPosition;
-        targetPosition = glm::vec2(this->InitialPosition.x + (x * unit_width), this->InitialPosition.y + (y * unit_height));
+        this->InitialPosition = glm::vec2(((float)this->Path[currentPathIndex][0] * unit_width) + unit_width / 2 - Radius,
+                                          ((float)this->Path[currentPathIndex][1] * unit_height) + unit_height / 2 - Radius);
         return;
     }
 
@@ -155,13 +158,15 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     this->CurrentPosition += movement;
 }
 
-bool Robot::ReachedGoal(){
-    bool reachedGoal = (glm::distance(CurrentPosition, GoalPosition) < 10.0f);
+bool Robot::ReachedGoal()
+{
+    bool reachedGoal = (glm::distance(this->CurrentPosition, GoalPosition) < 5.0f);
     return reachedGoal;
 }
 
-void Robot::UpdateStatus(){
-    if(this->Path.empty() || ReachedGoal())
+void Robot::UpdateStatus()
+{
+    if (currentPathIndex >= Path.size() || ReachedGoal())
         this->status = IDLE;
     else
         this->status = DELIVERING;

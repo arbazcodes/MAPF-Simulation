@@ -8,11 +8,11 @@
 #include "robot.h"
 #include "pibt.h"
 
-const glm::vec2 INITIAL_VELOCITY(100.0f, 100.0f);
+const glm::vec2 INITIAL_VELOCITY(500.0f, 500.0f);
 const float RADIUS = 30.0f;
 #define ROWS 6
 #define COLS 6
-#define NUMBER_OF_ROBOTS 10
+#define NUMBER_OF_ROBOTS 35
 
 class Sim
 {

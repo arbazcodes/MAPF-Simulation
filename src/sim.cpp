@@ -11,6 +11,7 @@
 // Game-related State data
 SpriteRenderer *Renderer;
 std::vector<glm::vec2> InitialPositions;
+std::vector<glm::vec3> RobotsColors;
 
 using CostPath = std::vector<std::vector<int>>;
 
@@ -35,8 +36,6 @@ void Sim::Clear()
     Robots.clear();
     globalPathIndex = 1;
     idle_robots.clear();
-    starts.clear();
-    goals.clear();
 }
 
 void Sim::Init()
@@ -62,15 +61,20 @@ void Sim::Init()
     this->UnitWidth = grid.unitWidth;
     this->UnitHeight = grid.unitHeight;
 
-    InitialPositions = {
-        glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (0.0f * UnitHeight) + UnitHeight / 2 - RADIUS),
-        glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (2.0f * UnitHeight) + UnitHeight / 2 - RADIUS),
-        glm::vec2((0.0f * UnitWidth) + UnitWidth / 2 - RADIUS, (1.0f * UnitHeight) + UnitHeight / 2 - RADIUS)};
+    for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
+    {
+        RobotsColors.push_back(glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX));
+    }
 
     auto endpoints = GenerateEndpoints(NUMBER_OF_ROBOTS, ROWS, COLS);
 
     starts = endpoints[0];
     goals = endpoints[1];
+
+    for (int i = 0; i < starts.size(); i++)
+    {
+        std::cout << "Start: (" << starts[i][0] << ", " << starts[i][1] << ", " << starts[i][2] << ")---" << "Gaol: (" << goals[i][0] << ", " << goals[i][1] << ", " << goals[i][2] << ")" << std::endl;
+    }
 
     // Create a PIBT planner
     pibt *planner;
@@ -111,22 +115,27 @@ void Sim::Init()
         std::vector<CostPath> sol;
 
         // Print results
-        // std::cout << "Final positions of agents:\n";
+        // for (auto agent : planner->agents)
+        // {
+        //     std::cout << "Agent " << agent->id << ": ";
+        //     for (const auto &step : agent->Path)
+        //     {
+        //         std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ")";
+        //     }
+        //     std::cout << std::endl;
+        // }
+
+        // Convert agent path to robot path format
         for (const Agent *agent : planner->agents)
         {
-            // Convert agent path to robot path format
             std::vector<std::vector<int>> robotPath;
-            // std::cout << "Agent " << agent->id << " - Path: ";
             for (const auto vertex : agent->Path)
             {
-                // std::cout << "(" << vertex[0]<< ", " << vertex[1] << ", " << vertex[2] << ") ";
                 robotPath.push_back({vertex[0], vertex[1], vertex[2]});
             }
             sol.push_back(robotPath);
-            // std::cout << std::endl;
         }
 
-        planner->Clear();
         delete planner;
 
         auto solution = CleanSolution(sol);
@@ -141,17 +150,11 @@ void Sim::Init()
         {
             glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec2 GoalPosition = glm::vec2(((float)solution[i].back()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].back()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
-            glm::vec3 robotColor = glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX);
-            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor));
+            glm::vec3 robotColor = RobotsColors[i];
+            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor, 0.0f, InitialPosition));
             Robots[i]->Path = solution[i];
             glm::vec2 destination = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
             grid.SetDestinationColor(destination, robotColor);
-
-            for (const auto &step : Robots[i]->Path)
-            {
-                std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ") ";
-            }
-            std::cout << std::endl;
         }
 
         std::cout << "\nDensity (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl;
@@ -169,7 +172,9 @@ void Sim::Update(float dt)
 {
     if (StateChanged())
     {
+        // sleep(2);
         Replan();
+        // sleep(10);
     }
     else
     {
@@ -216,36 +221,150 @@ bool Sim::StateChanged()
         else
             idle_robots.erase(robot->id);
     }
-    if (idle_robots.size() == NUMBER_OF_ROBOTS)
+    if (!idle_robots.empty())
         return true;
     return false;
 }
 
 void Sim::Replan()
 {
-    // std::vector<Pair> newStarts;
-    // std::vector<Pair> newGoals;
+    std::cout << "\nREPLANNED!!!\n";
+    std::vector<std::vector<int>> newStarts;
+    for (auto robot : Robots)
+    {
+        if(robot->currentPathIndex < robot->Path.size())
+            newStarts.push_back(robot->Path[robot->currentPathIndex]);
+    }
+    std::vector<std::vector<int>> newGoals = goals;
+    for (auto id : idle_robots)
+    {
+        bool found = false;
+        while (!found)
+        {
+            bool duplicate = false;
+            std::vector<std::vector<std::vector<int>>> endpoints = GenerateEndpoints(1, ROWS, COLS);
+            for (int i = 0; i < newStarts.size(); i++)
+            {
+                if (endpoints[0][0][0] == newStarts[id][0] && endpoints[0][0][1] == newStarts[id][1] ||
+                    endpoints[0][0][0] == newGoals[i][0] && endpoints[0][0][1] == newGoals[i][1])
+                {
+                    duplicate = true;
+                }
+            }
+            if (!duplicate)
+            {
 
-    // std::vector<std::vector<int>> current_positions;
-    // for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
-    // {
-    //     newStarts.push_back(({Robots[i]->Path[globalPathIndex]});
-    // }
-    
-    // for(auto id : idle_robots){
+                found = true;
+                newGoals[id] = endpoints[0][0];
+            }
+        }
+    }
+    for (int i = 0; i < newStarts.size(); i++)
+    {
+        std::cout << "New Start: (" << newStarts[i][0] << ", " << newStarts[i][1] << ", " << newStarts[i][2] << ")---" << 
+        "New Gaol: (" << newGoals[i][0] << ", " << newGoals[i][1] << ", " << newGoals[i][2] << ")" << std::endl;
+    }
 
-    //     std::vector<std::vector<Pair>> endpoits = GenerateEndpoints(1, ROWS, COLS);
-    //     bool duplicate = true;
+        goals = newGoals;
 
-    //     while()
-    // }
+    idle_robots.clear();
 
+    grid.Load("C:/Users/Lenovo/Desktop/Simulation - Copy/levels/6x6.lvl", this->Width, this->Height);
 
+    pibt *planner;
 
+    try
+    {
+        int recursive_run = 0;
+        int failure_count = 0;
+        std::chrono::duration<double> total_duration(0);
+        std::chrono::_V2::system_clock::time_point start_time;
+        start_time = std::chrono::high_resolution_clock::now();
 
-    sleep(1);
-    Clear();
-    Init();
+        while (recursive_run < 10)
+        {
+            planner = new pibt(COLS, ROWS, newStarts, newGoals);
+            planner->timesteps = 0;
+            planner->failed = false;
+            planner->run();
+
+            if (planner->failed)
+            {
+                recursive_run += 1;
+                if (recursive_run == 10)
+                {
+                    std::cout << "Failed or Timed Out!\n";
+                }
+            }
+            else
+            {
+                planner->SortAgentsById();
+                break;
+            }
+        }
+
+        std::vector<CostPath> sol;
+        for (const Agent *agent : planner->agents)
+        {
+            std::vector<std::vector<int>> robotPath;
+            for (const auto vertex : agent->Path)
+            {
+                robotPath.push_back({vertex[0], vertex[1], vertex[2]});
+            }
+            sol.push_back(robotPath);
+        }
+
+        delete planner;
+        globalPathIndex = 1;
+
+        // Print results
+        // for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
+        // {
+        //     std::cout << "Agent " << planner->agents[i]->id << ": ";
+        //     for (int j = 0; j < planner->agents[i]->Path.size(); j++)
+        //     {
+        //         std::cout << "(" << planner->agents[i]->Path[j][0] << ", " << planner->agents[i]->Path[j][1] << ", " << planner->agents[i]->Path[j][2] << ")";
+        //     }
+        //     std::cout << std::endl;
+        // }
+
+        auto solution = CleanSolution(sol);
+
+        auto end_time = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> iteration_duration = end_time - start_time;
+        total_duration += iteration_duration;
+        path_size = solution[0].size();
+
+        std::vector<float> current_rotations;
+        std::vector<glm::vec2> current_positions;
+        for (auto robot : Robots)
+        {
+            current_rotations.push_back(robot->CurrentRotation);
+            current_positions.push_back(robot->CurrentPosition);
+        }
+
+        Robots.clear();
+        for (int i = 0; i < NUMBER_OF_ROBOTS; ++i)
+        {
+            glm::vec2 InitialPosition = glm::vec2(((float)newStarts[i][0] * UnitWidth) + UnitWidth / 2 - RADIUS,
+                                                  ((float)newStarts[i][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
+            glm::vec2 GoalPosition = glm::vec2(((float)newGoals[i][0] * UnitWidth) + UnitWidth / 2 - RADIUS,
+                                               ((float)newGoals[i][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
+            glm::vec2 destination = glm::vec2((float)newGoals[i][0] * UnitWidth, (float)newGoals[i][1] * UnitHeight);
+            glm::vec3 robotColor = RobotsColors[i];
+            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY,
+                                       ResourceManager::GetTexture("robot"), robotColor, current_rotations[i], InitialPosition));
+            Robots[i]->Path = solution[i];
+            grid.SetDestinationColor(destination, robotColor);
+        }
+
+        std::cout << "\nDensity (Agents / Number of Cells: " << (float)((NUMBER_OF_ROBOTS / (float)(ROWS * COLS)) * 100) << "%" << std::endl;
+        std::cout << "Iteration Time: " << iteration_duration.count() << " seconds" << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Error: " << e.what() << '\n';
+    }
 }
 
 bool Sim::AllReached()
