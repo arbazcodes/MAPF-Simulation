@@ -21,7 +21,7 @@ CBS is a **hierarchical** algorithm that decomposes the pathfinding problem into
   - **Optimal for Up to 16% Density:** CBS works effectively with **up to 16%** density, $\left( \frac{\text{Number of agents}}{\text{Total available locations}} \right) \times 100$, ensuring optimal solutions.
   
 
-### Prioritized Informed-Subset Pathfinding (PIBT)  
+### *Priority Inheritance with Backtracking for Iterative Multi-agent Path Finding (PIBT) (PIBT)  
 PIBT is a **hierarchical** pathfinding algorithm designed to improve upon traditional prioritized planning methods by incorporating **informed search** techniques. PIBT prioritizes agents based on their difficulty of planning and allocates resources accordingly, improving scalability and efficiency when solving complex multi-agent pathfinding problems. It is particularly effective in large-scale environments where agents need to navigate with a minimal number of conflicts.  
 
 - **Performance Stats:**
