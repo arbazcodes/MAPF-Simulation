@@ -1,7 +1,8 @@
+#include "pibt_sim.h"
+#include "resource_manager.h"
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "sim.h"
-#include "resource_manager.h"
 #include <iostream>
 
 // GLFW function declarations
@@ -13,7 +14,7 @@ const unsigned int SCREEN_WIDTH = 800;
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
 
-Sim Simulation(SCREEN_WIDTH, SCREEN_HEIGHT);
+PIBT_Sim Simulation(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 int main(int argc, char *argv[])
 {   

@@ -1,12 +1,12 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef PIBT_SIM_H
+#define PIBT_SIM_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <set>
-#include <pibt.h>
+#include "pibt_alg.h"
 #include "grid.h"
-#include "robot.h"
+#include "pibt_robot.h"
 
 const glm::vec2 INITIAL_VELOCITY(500.0f, 500.0f);
 const float RADIUS = 30.0f;
@@ -14,7 +14,7 @@ const float RADIUS = 30.0f;
 #define COLS 6
 #define NUMBER_OF_ROBOTS 25
 
-class Sim
+class PIBT_Sim
 {
 public:
     unsigned int Width, Height;
@@ -25,8 +25,8 @@ public:
     std::vector<std::vector<int>> starts;
     std::vector<std::vector<int>> goals;
 
-    Sim(unsigned int width, unsigned int height);
-    ~Sim();
+    PIBT_Sim(unsigned int width, unsigned int height);
+    ~PIBT_Sim();
     void Init();
     void Update(float dt);
     void Render();
@@ -42,8 +42,8 @@ public:
     bool AllReachedGoal();
 
 private:
-    std::vector<Robot *> Robots;
+    std::vector<PIBT_Robot *> Robots;
     std::set<int> idle_robots;
 };
 
-#endif
+#endif // PIBT_SIM

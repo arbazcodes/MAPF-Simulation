@@ -1,11 +1,10 @@
 #include <tapf.h>
 #include <unistd.h>
 #include <chrono>
-#include "sim.h"
+#include "pibt_sim.h"
 #include "resource_manager.h"
 #include "sprite_renderer.h"
 #include "sim_object.h"
-#include "robot.h"
 
 // Game-related State data
 SpriteRenderer *Renderer;
@@ -14,17 +13,17 @@ std::vector<glm::vec3> RobotsColors;
 
 using CostPath = std::vector<std::vector<int>>;
 
-Sim::Sim(unsigned int width, unsigned int height)
+PIBT_Sim::PIBT_Sim(unsigned int width, unsigned int height)
     : Width(width), Height(height)
 {
 }
 
-Sim::~Sim()
+PIBT_Sim::~PIBT_Sim()
 {
     Clear();
 }
 
-void Sim::Clear()
+void PIBT_Sim::Clear()
 {
     ResourceManager::Clear();
     delete Renderer;
@@ -37,7 +36,7 @@ void Sim::Clear()
     idle_robots.clear();
 }
 
-void Sim::Init()
+void PIBT_Sim::Init()
 {
     ResourceManager::LoadShader("resources/shaders/sprite.vs", "resources/shaders/sprite.fs", nullptr, "sprite");
 
@@ -113,17 +112,6 @@ void Sim::Init()
 
         std::vector<CostPath> sol;
 
-        // Print results
-        // for (auto agent : planner->agents)
-        // {
-        //     std::cout << "Agent " << agent->id << ": ";
-        //     for (const auto &step : agent->Path)
-        //     {
-        //         std::cout << "(" << step[0] << ", " << step[1] << ", " << step[2] << ")";
-        //     }
-        //     std::cout << std::endl;
-        // }
-
         // Convert agent path to robot path format
         for (const Agent *agent : planner->agents)
         {
@@ -150,7 +138,7 @@ void Sim::Init()
             glm::vec2 InitialPosition = glm::vec2(((float)solution[i].front()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].front()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec2 GoalPosition = glm::vec2(((float)solution[i].back()[0] * UnitWidth) + UnitWidth / 2 - RADIUS, ((float)solution[i].back()[1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec3 robotColor = RobotsColors[i];
-            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor, 0.0f, InitialPosition));
+            Robots.push_back(new PIBT_Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY, ResourceManager::GetTexture("robot"), robotColor, 0.0f, InitialPosition));
             Robots[i]->Path = solution[i];
             glm::vec2 destination = glm::vec2((float)solution[i].back()[0] * UnitWidth, (float)solution[i].back()[1] * UnitHeight);
             grid.SetDestinationColor(destination, robotColor);
@@ -167,13 +155,11 @@ void Sim::Init()
     }
 }
 
-void Sim::Update(float dt)
+void PIBT_Sim::Update(float dt)
 {
     if (StateChanged())
     {
-        // sleep(2);
         Replan();
-        // sleep(10);
     }
     else
     {
@@ -211,7 +197,7 @@ void Sim::Update(float dt)
     }
 }
 
-bool Sim::StateChanged()
+bool PIBT_Sim::StateChanged()
 {
     for (auto robot : Robots)
     {
@@ -225,7 +211,7 @@ bool Sim::StateChanged()
     return false;
 }
 
-void Sim::Replan()
+void PIBT_Sim::Replan()
 {
     std::cout << "\nREPLANNED!!!\n";
     std::vector<std::vector<int>> newStarts;
@@ -316,17 +302,6 @@ void Sim::Replan()
         delete planner;
         globalPathIndex = 1;
 
-        // Print results
-        // for (int i = 0; i < NUMBER_OF_ROBOTS; i++)
-        // {
-        //     std::cout << "Agent " << planner->agents[i]->id << ": ";
-        //     for (int j = 0; j < planner->agents[i]->Path.size(); j++)
-        //     {
-        //         std::cout << "(" << planner->agents[i]->Path[j][0] << ", " << planner->agents[i]->Path[j][1] << ", " << planner->agents[i]->Path[j][2] << ")";
-        //     }
-        //     std::cout << std::endl;
-        // }
-
         auto solution = CleanSolution(sol);
 
         auto end_time = std::chrono::high_resolution_clock::now();
@@ -351,7 +326,7 @@ void Sim::Replan()
                                                ((float)newGoals[i][1] * UnitHeight) + UnitHeight / 2 - RADIUS);
             glm::vec2 destination = glm::vec2((float)newGoals[i][0] * UnitWidth, (float)newGoals[i][1] * UnitHeight);
             glm::vec3 robotColor = RobotsColors[i];
-            Robots.push_back(new Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY,
+            Robots.push_back(new PIBT_Robot(i, InitialPosition, GoalPosition, RADIUS, INITIAL_VELOCITY,
                                        ResourceManager::GetTexture("robot"), robotColor, current_rotations[i], InitialPosition));
             Robots[i]->Path = solution[i];
             grid.SetDestinationColor(destination, robotColor);
@@ -366,7 +341,7 @@ void Sim::Replan()
     }
 }
 
-bool Sim::AllReached()
+bool PIBT_Sim::AllReached()
 {
     for (auto robot : Robots)
     {
@@ -375,7 +350,7 @@ bool Sim::AllReached()
     }
     return true;
 }
-bool Sim::AllRotated()
+bool PIBT_Sim::AllRotated()
 {
     for (auto robot : Robots)
     {
@@ -386,7 +361,7 @@ bool Sim::AllRotated()
     return true;
 }
 
-bool Sim::AllReachedGoal()
+bool PIBT_Sim::AllReachedGoal()
 {
     for (auto robot : Robots)
     {
@@ -397,7 +372,7 @@ bool Sim::AllReachedGoal()
     return true;
 }
 
-void Sim::Render()
+void PIBT_Sim::Render()
 {
     Renderer->DrawSprite(ResourceManager::GetTexture("background"), glm::vec2(0.0f, 0.0f), glm::vec2(this->Width, this->Height), 0.0f);
     this->grid.Draw(*Renderer);
@@ -408,7 +383,7 @@ void Sim::Render()
     }
 }
 
-std::vector<std::vector<std::vector<int>>> Sim::CleanSolution(const std::vector<std::vector<std::vector<int>>> &sol)
+std::vector<std::vector<std::vector<int>>> PIBT_Sim::CleanSolution(const std::vector<std::vector<std::vector<int>>> &sol)
 {
 
     std::vector<std::vector<std::vector<int>>> solution = sol;

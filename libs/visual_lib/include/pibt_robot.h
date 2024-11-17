@@ -1,17 +1,18 @@
-#ifndef ROBOT_H
-#define ROBOT_H
+#ifndef PIBT_ROBOT_H
+#define PIBT_ROBOT_H
+
+#include "texture.h"
+#include "sprite_renderer.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <iostream>
 #include <stdio.h>
-#include "texture.h"
-#include "sprite_renderer.h"
 #include <vector>
 
 enum Status {IDLE, DELIVERING};
 
-class Robot
+class PIBT_Robot
 {
 public:
     float Radius;
@@ -29,8 +30,8 @@ public:
     std::vector<std::vector<int>> Path;
     int currentPathIndex;
 
-    Robot();
-    Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion);
+    PIBT_Robot();
+    PIBT_Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion);
 
     void UpdateStatus();
     bool ReachedGoal();

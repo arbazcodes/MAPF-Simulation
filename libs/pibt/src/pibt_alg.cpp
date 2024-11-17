@@ -1,4 +1,5 @@
-#include "pibt.h"
+#include "pibt_alg.h"
+
 #include <algorithm>
 #include <iostream>
 #include <random>

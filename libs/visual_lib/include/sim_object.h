@@ -1,5 +1,5 @@
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
+#ifndef SIM_OBJECT_H
+#define SIM_OBJECT_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>

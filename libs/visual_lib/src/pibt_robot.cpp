@@ -1,20 +1,20 @@
-#include "robot.h"
+#include "pibt_robot.h"
 
 // Constructor with default values
-Robot::Robot()
+PIBT_Robot::PIBT_Robot()
     : id(), InitialPosition(0.0f, 0.0f), GoalPosition(0.0f, 0.0f), CurrentPosition(0.0f, 0.0f), Velocity(0.0f, 0.0f), Radius(1.0f), Sprite(), InitialRotation(0.0f), CurrentRotation(0.0f), AngularVelocity(300.0f), Color(glm::vec3(1.0f, 1.0f, 1.0f))
 {
     reached = false, rotated = false;
 }
 
 // Constructor with specified values
-Robot::Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion)
+PIBT_Robot::PIBT_Robot(int i, glm::vec2 pos, glm::vec2 goal, float radius, glm::vec2 velocity, Texture2D sprite, glm::vec3 color, float current_rotation, glm::vec2 current_postion)
     : id(i), InitialPosition(pos), GoalPosition(goal), CurrentPosition(current_postion), Velocity(velocity), Radius(radius), Sprite(sprite), InitialRotation(0.0f), CurrentRotation(current_rotation), AngularVelocity(500.0f), Color(color)
 {
     reached = false, rotated = false;
 }
 
-void Robot::Rotate(float dt)
+void PIBT_Robot::Rotate(float dt)
 {
 
     targetDirection = Path[currentPathIndex][2];
@@ -62,8 +62,6 @@ void Robot::Rotate(float dt)
     if (std::abs(angleDiff) < rotationSpeed)
     {
         this->CurrentRotation = targetAngle;
-        // this->isRotating = false;
-        // this->isMoving = true;
         rotated = true;
     }
     else
@@ -80,12 +78,12 @@ void Robot::Rotate(float dt)
     }
 }
 
-void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsReached, bool AllRobotsRotated)
+void PIBT_Robot::Move(float dt, float unit_width, float unit_height, bool AllPIBT_RobotsReached, bool AllPIBT_RobotsRotated)
 {
     if (!this->isMoving)
         return;
 
-    if (!AllRobotsRotated)
+    if (!AllPIBT_RobotsRotated)
         return;
 
     int x, y;
@@ -158,13 +156,13 @@ void Robot::Move(float dt, float unit_width, float unit_height, bool AllRobotsRe
     this->CurrentPosition += movement;
 }
 
-bool Robot::ReachedGoal()
+bool PIBT_Robot::ReachedGoal()
 {
     bool reachedGoal = (glm::distance(this->CurrentPosition, GoalPosition) < 5.0f);
     return reachedGoal;
 }
 
-void Robot::UpdateStatus()
+void PIBT_Robot::UpdateStatus()
 {
     if (currentPathIndex >= Path.size() || ReachedGoal())
         this->status = IDLE;
@@ -172,18 +170,18 @@ void Robot::UpdateStatus()
         this->status = DELIVERING;
 }
 
-void Robot::Reset(glm::vec2 position, glm::vec2 velocity)
+void PIBT_Robot::Reset(glm::vec2 position, glm::vec2 velocity)
 {
     this->CurrentPosition = position;
     this->Velocity = velocity;
 }
 
-void Robot::Draw(SpriteRenderer &renderer)
+void PIBT_Robot::Draw(SpriteRenderer &renderer)
 {
     renderer.DrawSprite(Sprite, CurrentPosition, glm::vec2(Radius * 2, Radius * 2), CurrentRotation, Color);
 }
 
-glm::vec2 Robot::GetPosition()
+glm::vec2 PIBT_Robot::GetPosition()
 {
     return CurrentPosition;
 }
