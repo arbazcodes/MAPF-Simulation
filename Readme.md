@@ -56,7 +56,7 @@ Before building the project, ensure that the following dependencies are installe
 ### Build Instructions  
 1. Clone the repository:  
    ```bash  
-   git git@github.com:arbazcodes/MAPF-Simulation.git 
+   git clone git@github.com:arbazcodes/MAPF-Simulation.git 
    cd MAPF-Simulation
 2. Create and navigate to the build directory:  
    ```bash  
